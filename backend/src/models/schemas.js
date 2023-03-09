@@ -10,6 +10,13 @@ const BMCCourseSchema = new mongoose.Schema({
   enrollment: Number,
 });
 
+const BMCInstructorSchema = new mongoose.Schema({
+  name: String,
+  last_name: String,
+  email: String,
+  department: String,
+});
+
 const courseReviewSchema = new mongoose.Schema({
   courseTitle: { type: String, required: true },
   courseID: { type: String, required: true, unique: true },
@@ -41,6 +48,7 @@ const instructorReviewSchema = new mongoose.Schema({
 
 module.exports = {
   BMCCourseSchema,
+  BMCInstructorSchema,
   instructorReviewSchema,
   courseReviewSchema,
 };

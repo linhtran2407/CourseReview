@@ -15,19 +15,23 @@ import {
 import Select from "@mui/material/Select";
 import { useState } from "react";
 import axios from "axios";
+import AlertDialog from "./AlertDialog";
+import { Check, Send } from "@mui/icons-material";
 
 function CourseReviewForm() {
-  const backendPrefix = "http://localhost:8000/api/v1/";
+  const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     semester: "",
+    semesterCode: "",
     department: "CMSC",
     course: "",
     courseNumber: "",
     courseTitle: "",
     instructor: "",
+    instructorName: "",
     instructorEmail: "",
     courseQuality: 1,
     instructorQuality: 1,
@@ -36,6 +40,7 @@ function CourseReviewForm() {
     amountLearned: 1,
     recMajor: 1,
     recMinor: 1,
+    comment: "",
   });
 
   const handleChange = (e) => {
@@ -43,13 +48,14 @@ function CourseReviewForm() {
     if (e.target.type === "number") {
       value = Number(value); // Convert to number
     }
+
     setFormData({ ...formData, [e.target.name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await axios.post(`${backendPrefix}review/course`, formData, {
+    const res = await axios.post(`${backendPrefix}/review/course`, formData, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -66,7 +72,9 @@ function CourseReviewForm() {
   const [formattedCoursesBySem, setFormattedCoursesBySem] = React.useState([]);
 
   const fetchCoursesBySem = async (semester) => {
-    const res = await axios.get(`${backendPrefix}data/bmc_courses/${semester}`);
+    const res = await axios.get(
+      `${backendPrefix}/data/bmc_courses/${semester}`
+    );
 
     if (res.status !== 200 || !res.data) {
       console.error("error fetching courses by semester");
@@ -85,8 +93,14 @@ function CourseReviewForm() {
     if (formData.semester) {
       // reset course and instructor + reload list of courses
       // when semester changes
-      setFormData({ ...formData, course: "", instructor: "" });
-      fetchCoursesBySem(standardizeSemester(formData.semester));
+      const semesterCode = standardizeSemester(formData.semester);
+      setFormData({
+        ...formData,
+        course: "",
+        instructor: "",
+        semesterCode: semesterCode,
+      });
+      fetchCoursesBySem(semesterCode);
     }
   }, [formData.semester]);
 
@@ -119,7 +133,7 @@ function CourseReviewForm() {
 
   async function getInstructor(instructor) {
     const res = await axios.get(
-      `${backendPrefix}data/bmc_instructors/${formData.department}/${instructor}`
+      `${backendPrefix}/data/bmc_instructors/${formData.department}/${instructor}`
     );
     if (res.status !== 200 || !res.data) {
       console.error("error fetching instructors by deparment + last name");
@@ -181,6 +195,7 @@ function CourseReviewForm() {
       setFormData({
         ...formData,
         instructorEmail: email,
+        instructorName: name,
       });
     }
   }, [formData.instructor]);
@@ -188,6 +203,16 @@ function CourseReviewForm() {
   function hasRequiredFields() {
     return formData.semester && formData.course && formData.instructor;
   }
+
+  const [submissionAlert, setSubmissionAlert] = React.useState(false);
+
+  const openSubmissionAlert = () => {
+    setSubmissionAlert(true);
+  };
+
+  const closeSubmissionAlert = () => {
+    setSubmissionAlert(false);
+  };
 
   return (
     <div>
@@ -439,19 +464,52 @@ function CourseReviewForm() {
                   />
                 </Grid>
               </Grid>
+
+              <Grid container item spacing={2}>
+                <FormControl
+                  xs={2}
+                  fullWidth
+                  style={{ marginBottom: "16px", marginLeft: "16px" }}
+                >
+                  <TextField
+                    id="comment"
+                    name="comment"
+                    value={formData.comment}
+                    onChange={handleChange}
+                    label="Additional Comment"
+                    multiline
+                    rows={4}
+                  />
+                </FormControl>
+              </Grid>
             </Grid>
           </Box>
         ) : null}
-
+        <AlertDialog
+          open={submissionAlert}
+          handleClose={closeSubmissionAlert}
+        />
         <Stack spacing={2} direction="row">
-          <Button variant="contained" color="success" type="submit">
+          <Button
+            xs={2}
+            variant="contained"
+            color="success"
+            type="submit"
+            onClick={openSubmissionAlert}
+            endIcon={<Send />}
+          >
             Submit
           </Button>
+
+          
+
           <Button
+            xs={2}
             variant="contained"
             color="error"
             type="submit"
             onClick={() => navigate("/")}
+            endIcon={<Check/>}
           >
             Cancel
           </Button>

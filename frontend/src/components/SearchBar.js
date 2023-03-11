@@ -4,8 +4,10 @@ import Autocomplete from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { Search } from "@mui/icons-material";
+import "../css/SearchBar.css"
 
-const backendPrefix = "http://localhost:8000/api/v1";
+const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
 
 function SearchBar() {
   const [data, setData] = React.useState([]);
@@ -28,7 +30,7 @@ function SearchBar() {
   return (
     <>
     <h1>BiCo Course Review</h1>
-    <div>
+    <div className="search">
       <Autocomplete
         id="course-search"
         freeSolo
@@ -44,7 +46,7 @@ function SearchBar() {
         renderInput={(params) => (
           <TextField
             {...params}
-            label="Search for course or instructor"
+            label="Enter a course or instructor"
             InputProps={{
               ...params.InputProps,
               type: "search",
@@ -54,8 +56,8 @@ function SearchBar() {
         sx={{ width: "500px" }}
       />
 
-      <Link to="/search-review">
-        <Button variant="contained" color="secondary">
+      <Link to="/search-review" className="link-button">
+        <Button variant="outlined" startIcon={<Search/>} >
           Search for Review
         </Button>
       </Link>

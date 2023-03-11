@@ -1,0 +1,11 @@
+.search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.link-button {
+    margin-left: 5vw;
+    text-decoration: none;
+}

@@ -21,11 +21,13 @@ db.once("open", () => console.log("Connected to DB"));
 //Import routes
 const getDataRouter = require("./src/routes/data");
 const reviewsRouter = require("./src/routes/review");
+const adminRouter = require("./src/routes/admin");
 
 // Use routes
 const ver = "/api/v1";
 app.use(`${ver}/data`, getDataRouter);
 app.use(`${ver}/review`, reviewsRouter);
+app.use(`${ver}/admin`, adminRouter);
 
 // Start server
 const PORT = process.env.PORT || 8000;

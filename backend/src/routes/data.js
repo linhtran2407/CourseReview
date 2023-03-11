@@ -64,26 +64,6 @@ router.get("/bmc_courses/:semester", async (req, res) => {
   }
 });
 
-// get lists of instructors by course number + semester
-router.get("/instructors/:semester/:courseNum", async (req, res) => {
-  try {
-    // ! assume to be BMC instructor by finding from BMC db 
-    const courses = await BMCCourseModel.find({
-      semester: req.params.semester,
-      number: req.params.courseNum,
-    });
-
-    const instructors = courses.map(course => 
-      course.instructor
-    );
-
-    res.status(200).json(instructors);
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
-  }
-});
-
 // get BMC instructors by department and last name
 router.get("/bmc_instructors/:dept/:lastName", async (req, res) => {
   try {

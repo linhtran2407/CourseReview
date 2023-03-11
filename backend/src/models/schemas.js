@@ -19,9 +19,10 @@ const BMCInstructorSchema = new mongoose.Schema({
 
 const courseReviewSchema = new mongoose.Schema({
   courseTitle: { type: String, required: true },
-  courseID: { type: String, required: true, unique: true },
+  courseNumber: { type: Number, required: true },
   semester: { type: String, required: true },
-  instructor: { type: String, required: true },
+  instructorName: { type: String, required: true },
+  instructorEmail: { type: String, required: true },
   courseQuality: { type: Number, required: true },
   instructorQuality: { type: Number, required: true },
   difficulty: { type: Number, required: true },
@@ -29,13 +30,9 @@ const courseReviewSchema = new mongoose.Schema({
   amountLearned: { type: Number, required: true },
   recMajor: { type: Number },
   recMinor: { type: Number },
-  readingValues: { type: Number },
+  comment: { type: String },
+  status: { type: Boolean },
 });
-
-courseReviewSchema.methods.standardizeName = function () {
-  this.courseID = this.courseID.toUpperCase();
-  return this.courseID;
-};
 
 const instructorReviewSchema = new mongoose.Schema({
   name: { type: String, required: true },

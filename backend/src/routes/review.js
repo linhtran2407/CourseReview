@@ -1,29 +1,32 @@
 const express = require("express");
 const router = express.Router();
-const { CourseReview } = require("../models/models");
-
-router.get("/allReviews", async (req, res) => {
-  try {
-    const courseReviews = await CourseReview.find();
-    res.status(200).json(courseReviews);
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
-  }
-});
+const { courseReviewModel } = require("../models/models");
 
 // add new course review
 router.post("/course", async (req, res) => {
-  console.log(req.body);
-  // const courseReview = new CourseReview(req.body);
-  // console.log(courseReview);
-  // try {
-  //   await courseReview.save();
-  //   res.redirect("/");
-  // } catch (err) {
-  //   console.error(err);
-  //   res.sendStatus(500);
-  // }
+  try {
+    const courseReview = new courseReviewModel({
+      courseTitle: req.body.courseTitle,
+      courseNumber: req.body.courseNumber,
+      semester: req.body.semesterCode,
+      instructorName: req.body.instructorName,
+      instructorEmail: req.body.instructorEmail,
+      courseQuality: req.body.courseQuality,
+      instructorQuality: req.body.instructorQuality,
+      difficulty: req.body.difficulty,
+      workRequired: req.body.workRequired,
+      amountLearned: req.body.amountLearned,
+      recMajor: req.body.recMajor,
+      recMinor: req.body.recMinor,
+      comment: req.body.comment,
+      status: false,
+    });
+    const savedCourseReview = await courseReview.save();
+    res.status(201).json(savedCourseReview);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 module.exports = router;

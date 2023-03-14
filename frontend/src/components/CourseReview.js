@@ -7,21 +7,10 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import { Delete, DoneAllRounded } from "@mui/icons-material";
 import axios from "axios";
+import { shortToLongSemester, fullCourseName } from "./Formartter";
 
 function CourseReview({ review, idx, onDelete, isAdmin }) {
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
-  function formatSemester(semester) {
-    if (!semester) return "";
-    const season = semester.startsWith("s") ? "Spring" : "Fall";
-    const year = semester.slice(1);
-    return `${season} 20${year}`;
-  }
-
-  function renderTitle(courseTitle, courseNumber, institution) {
-    const institutionInitial = institution.slice(0, 1).toUpperCase();
-    const title = `${institutionInitial}${courseNumber} - ${courseTitle}`;
-    return title;
-  }
 
   const colors = [
     "#FEE1E6",
@@ -66,10 +55,10 @@ function CourseReview({ review, idx, onDelete, isAdmin }) {
     >
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          {renderTitle(review.courseTitle, review.courseNumber, "B")}
+          {fullCourseName(review.courseTitle, review.courseNumber, "B")}
         </Typography>
         <Typography gutterBottom variant="h5" component="div">
-          {formatSemester(review.semester)}
+          {shortToLongSemester(review.semester)}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Instructor: {review.instructorName} - {review.instructorEmail}
@@ -99,18 +88,20 @@ function CourseReview({ review, idx, onDelete, isAdmin }) {
           Comment: {review.comment}
         </Typography>
       </CardContent>
-      {isAdmin? <CardActions>
-        <Tooltip title="Approve">
-          <IconButton onClick={handleApprove}>
-            <DoneAllRounded />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Delete">
-          <IconButton onClick={handleDelete}>
-            <Delete />
-          </IconButton>
-        </Tooltip>
-      </CardActions> : null}
+      {isAdmin ? (
+        <CardActions>
+          <Tooltip title="Approve">
+            <IconButton onClick={handleApprove}>
+              <DoneAllRounded />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Delete">
+            <IconButton onClick={handleDelete}>
+              <Delete />
+            </IconButton>
+          </Tooltip>
+        </CardActions>
+      ) : null}
     </Card>
   );
 }

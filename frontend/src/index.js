@@ -8,6 +8,8 @@ import Home from "./components/Home";
 import CourseReviewForm from "./components/CourseReviewForm";
 import SearchBar from "./components/SearchBar";
 import Admin from "./components/Admin";
+import Review from "./components/Review";
+import SemesterTable from "./components/SemesterTable";
 
 const router = createBrowserRouter([
   {
@@ -28,6 +30,14 @@ const router = createBrowserRouter([
   {
     path: "admin",
     element: <Admin />,
+  },
+  {
+    path: "search-review",
+    element: <Review />,
+  },
+  {
+    path: "test",
+    element: <SemesterTable />,
   },
 ]);
 

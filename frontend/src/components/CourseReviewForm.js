@@ -61,8 +61,8 @@ function CourseReviewForm() {
       },
     });
 
-    if (res.status !== 200 || !res.data) {
-      console.error("error saving course review");
+    if (res.status !== 200 && res.status !== 201 || !res.data) {
+      console.error("error saving course review: " + res.status);
       return;
     }
   };

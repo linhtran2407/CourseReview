@@ -31,7 +31,7 @@ const courseReviewSchema = new mongoose.Schema({
   recMajor: { type: Number },
   recMinor: { type: Number },
   comment: { type: String },
-  status: { type: Boolean },
+  status: { type: Number }, // 0: pending, 1: approved, 2: rejected
 });
 
 const instructorReviewSchema = new mongoose.Schema({

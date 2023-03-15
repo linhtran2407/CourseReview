@@ -25,93 +25,6 @@ import Header from "./Header";
 import SearchBar from "./SearchBar";
 import { courseMetrics } from "./ReviewMetrics";
 
-function Row(props) {
-  const data = props.data;
-  const [open, setOpen] = React.useState(false);
-
-  return (
-    <React.Fragment>
-      <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
-        <TableCell>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-
-        <TableCell component="th" scope="row">
-          {instructorNameEmail(data.instructorName, data.instructorEmail)}
-        </TableCell>
-
-        {courseMetrics.map((metric) => (
-          <TableCell align="center"> {data[metric.id]} </TableCell>
-        ))}
-      </TableRow>
-
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 1 }}>
-              <Typography
-                variant="body2"
-                gutterBottom
-                component="div"
-                style={{ fontWeight: "bold" }}
-              >
-                Breakdown of individual reviews
-              </Typography>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell></TableCell> {/**cell left empty on purpose */}
-                    <TableCell
-                      style={{ top: 57, minWidth: 170 }}
-                    ></TableCell>{" "} {/**cell left empty on purpose */}
-                    {courseMetrics.map((column) => (
-                      <TableCell
-                        key={column.id}
-                        align="center"
-                        style={{ top: 57 }}
-                      >
-                        {column.name}
-                      </TableCell>
-                    ))}
-                    <TableCell
-                    key={"comment"}
-                    align="center"
-                    style={{ top: 57 }}
-                    >
-                    Additional Comment
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {/* {row.breakdown.map((historyRow) => (
-                    <TableRow key={historyRow.date}>
-                      <TableCell component="th" scope="row">
-                        {historyRow.date}
-                      </TableCell>
-                      <TableCell>{historyRow.customerId}</TableCell>
-                      <TableCell align="right">{historyRow.amount}</TableCell>
-                      <TableCell align="right">
-                        {Math.round(historyRow.amount * row.price * 100) / 100}
-                      </TableCell>
-                    </TableRow>
-                  ))} */}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
-  );
-}
-
 function Review() {
   const location = useLocation();
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
@@ -185,7 +98,7 @@ function Review() {
           <Grid item xs={12}>
             {Object.keys(reviews).map((sem) => (
               <Paper sx={{ width: "100%", overflow: "hidden" }}>
-                <TableContainer >
+                <TableContainer>
                   <Table stickyHeader>
                     <TableHead>
                       <TableRow>
@@ -199,7 +112,6 @@ function Review() {
                       </TableRow>
 
                       <TableRow>
-                        <TableCell></TableCell> {/* empty cell on purpose */}
                         <TableCell
                           key="instructor"
                           align="center"
@@ -220,12 +132,32 @@ function Review() {
                     </TableHead>
 
                     <TableBody>
-                      {Object.keys(reviews[sem]).map((instructor) => (
-                        <Row
-                          data={getAvgData(reviews[sem][instructor])}
-                          label="avg"
-                        />
-                      ))}
+                      {Object.keys(reviews[sem]).map((instructor) => {
+                        const data = getAvgData(reviews[sem][instructor]);
+                        return (
+                          <TableRow
+                            onClick={() => {
+                              console.log("clicked");
+                            }}
+                            hover
+                            sx={{ "& > *": { borderBottom: "unset" } }}
+                          >
+                            <TableCell component="th" scope="row">
+                              {instructorNameEmail(
+                                data.instructorName,
+                                data.instructorEmail
+                              )}
+                            </TableCell>
+
+                            {courseMetrics.map((metric) => (
+                              <TableCell align="center">
+                                {" "}
+                                {data[metric.id]}{" "}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </TableContainer>

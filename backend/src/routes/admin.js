@@ -15,7 +15,7 @@ router.post("/authenAdmin", async (req, res) => {
 
 router.get("/pendingReviews", async (req, res) => {
     try {
-      const courseReviews = await courseReviewModel.find({status: false});
+      const courseReviews = await courseReviewModel.find({status: 0});
       res.status(200).json(courseReviews);
     } catch (err) {
       console.error(err);
@@ -27,7 +27,7 @@ router.get("/pendingReviews", async (req, res) => {
     const id = req.params.id;
   
     try {
-      const updatedRecord = await courseReviewModel.findByIdAndUpdate(id, { status: true }, { new: true });
+      const updatedRecord = await courseReviewModel.findByIdAndUpdate(id, { status: 1 }, { new: true });
       res.status(200).json(updatedRecord);
     } catch (error) {
       console.error(error);
@@ -55,4 +55,5 @@ router.get("/pendingReviews", async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
       }
 });
+
 module.exports = router;

@@ -89,14 +89,17 @@ router.get("/bmc_instructors/:dept/:lastName", async (req, res) => {
 });
 
 // get all reviews of course with courseNumber
-// grouped by semester and sorted in reverse chronological order
+// grouped by semester, then by instructor
+// and sorted in reverse chronological order
+// and append a object containing average scores in result
 router.get("/review_course/:courseNumber", async (req, res) => {
   try {
     const reviews = await courseReviewModel.find({
       courseNumber: req.params.courseNumber,
-      status: true,
+      status: 1, // approved
     });
 
+    // group reviews by semester
     const groupResult = reviews.reduce((acc, curr) => {
       const semester = curr.semester;
       if (!acc[semester]) {
@@ -113,7 +116,7 @@ router.get("/review_course/:courseNumber", async (req, res) => {
         const yearB = parseInt(b.slice(1));
         const semesterA = a.charAt(0) === "f" ? 0 : 1;
         const semesterB = b.charAt(0) === "f" ? 0 : 1;
-      
+
         if (yearA === yearB) {
           return semesterB - semesterA;
         } else {
@@ -125,33 +128,74 @@ router.get("/review_course/:courseNumber", async (req, res) => {
         return acc;
       }, {});
 
-      const updatedResult = Object.keys(sortResult).reduce((acc, semester) => {
-        const semesterGroups = sortResult[semester];
-        const instructorMap = semesterGroups.reduce((instructors, group) => {
-          const email = group.instructorEmail;
-          if (!instructors[email]) {
-            instructors[email] = [];
-          }
-          instructors[email].push(group);
-          return instructors;
-        }, {});
-        acc[semester] = instructorMap;
-        return acc;
+    // group reviews in each semester by instructor
+    const updatedResult = Object.keys(sortResult).reduce((acc, semester) => {
+      const semesterGroups = sortResult[semester];
+      const instructorMap = semesterGroups.reduce((instructors, group) => {
+        const email = group.instructorEmail;
+        if (!instructors[email]) {
+          instructors[email] = [];
+        }
+        instructors[email].push(group);
+        return instructors;
       }, {});
+      acc[semester] = instructorMap;
+      return acc;
+    }, {});
+
+    Object.keys(updatedResult).forEach((sem) => {
+      const instructorMaps = updatedResult[sem];
+      Object.keys(instructorMaps).forEach((instructor) => {
+        const averages = computeAverages(instructorMaps[instructor]);
+        averages.label = "avg"; // add a label for object containing averages
+        instructorMaps[instructor].push(averages);
+      });
+    });
 
     res.status(200).json(updatedResult);
-
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
   }
 });
 
+function computeAverages(list) {
+  const fields = [
+    "instructorName",
+    "instructorEmail",
+    "courseQuality",
+    "instructorQuality",
+    "difficulty",
+    "workRequired",
+    "amountLearned",
+    "recMajor",
+    "recMinor",
+  ];
+  const result = list.reduce((acc, curr) => {
+    for (let key of fields) {
+      if (key.startsWith("instructor")) {
+        acc[key] = curr[key];
+      } else {
+        acc[key] = (acc[key] || 0) + curr[key];
+
+      }
+    }
+    return acc;
+  }, {});
+
+  for (let key in result) {
+    if (key.startsWith("instructor")) { continue; }
+    result[key] = +(result[key] / list.length).toFixed(2);
+  }
+
+  return result;
+}
+
 router.get("/review_instructor/:instructorEmail", async (req, res) => {
   try {
     const reviews = await instructorReviewModel.find({
       instructorEmail: req.params.instructorEmail,
-      status: true,
+      status: 1, // approved
     });
 
     res.status(200).json(reviews);

@@ -19,7 +19,7 @@ router.post("/course", async (req, res) => {
       recMajor: req.body.recMajor,
       recMinor: req.body.recMinor,
       comment: req.body.comment,
-      status: false,
+      status: 0, // pending
     });
     const savedCourseReview = await courseReview.save();
     res.status(201).json(savedCourseReview);

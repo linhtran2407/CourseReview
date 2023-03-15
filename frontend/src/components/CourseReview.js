@@ -7,7 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import { Delete, DoneAllRounded } from "@mui/icons-material";
 import axios from "axios";
-import { shortToLongSemester, fullCourseName } from "./Formartter";
+import { shortToLongSemester, fullCourseName, showStatus } from "./Formartter";
 
 function CourseReview({ review, idx, onDelete, isAdmin }) {
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
@@ -64,7 +64,7 @@ function CourseReview({ review, idx, onDelete, isAdmin }) {
           Instructor: {review.instructorName} - {review.instructorEmail}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          review Quality: {review.courseQuality}
+          Course Quality: {review.courseQuality}
         </Typography>
         <Typography variant="body2" color="text.secondary">
           Instructor Quality: {review.instructorQuality}
@@ -87,6 +87,9 @@ function CourseReview({ review, idx, onDelete, isAdmin }) {
         <Typography variant="body2" color="text.secondary">
           Comment: {review.comment}
         </Typography>
+        {isAdmin ? <Typography variant="body2" color="text.secondary">
+          Status: {showStatus(review.status)}
+        </Typography> : null}
       </CardContent>
       {isAdmin ? (
         <CardActions>

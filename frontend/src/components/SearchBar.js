@@ -1,11 +1,11 @@
 import * as React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Search } from "@mui/icons-material";
 import "../css/SearchBar.css";
+import { InputAdornment } from "@mui/material";
 
 const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
 
@@ -29,9 +29,14 @@ function SearchBar() {
     fetchOptions();
   }, []);
 
+  function handleKeyPress(e) {
+    if (e.key === 'Enter') {
+      navigate("/search-review", { state: selectedOption })
+    }
+}
+
   return (
-    <>
-      <h1>BiCo Course Review</h1>
+  
       <div className="search">
         <Autocomplete
           id="course-search"
@@ -48,28 +53,27 @@ function SearchBar() {
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Enter a course or instructor"
+              label="Search for reviews of course or instructor"
               InputProps={{
                 ...params.InputProps,
                 type: "search",
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search />
+                  </InputAdornment>
+                ),
               }}
+              onKeyUp={handleKeyPress.bind(this)}
             />
           )}
           sx={{ width: "500px" }}
           onChange={(event, selectedOption) => setSelectedOption(selectedOption)
+            
           }
         />
 
-        <Button
-          className="link-button"
-          variant="outlined"
-          startIcon={<Search />}
-          onClick={selectedOption && selectedOption.name ? () => navigate("/search-review", { state: selectedOption }) : () => {}}
-        >
-          Search for Review
-        </Button>
       </div>
-    </>
+    
   );
 }
 

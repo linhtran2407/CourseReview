@@ -8,7 +8,6 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
@@ -20,49 +19,14 @@ import {
   shortToLongSemester,
 } from "./Formartter";
 import { TableBody } from "@mui/material";
-
-const courseReviewColsDef = [
-  {
-    id: "instructor",
-    name: "Instructor",
-    minWidth: 170,
-    format: (name, email) => `${name} - ${email}`,
-  },
-  { id: "courseQuality", name: "Course Quality" },
-  { id: "instructorQuality", name: "Instructor Quality" },
-  { id: "difficulty", name: "Difficulty" },
-  { id: "workRequired", name: "Work Required" },
-  { id: "amountLearned", name: "Amount Learned" },
-  { id: "recMajor", name: "Rec. for Major" },
-  { id: "recMinor", name: "Rec. for Minor" },
-];
-
-function createData(
-  instructorNameEmail,
-  courseQuality,
-  instructorQuality,
-  difficulty,
-  workRequired,
-  amountLearned,
-  recMajor,
-  recMinor,
-  breakdown
-) {
-  return {
-    instructorNameEmail,
-    courseQuality,
-    instructorQuality,
-    difficulty,
-    workRequired,
-    amountLearned,
-    recMajor,
-    recMinor,
-    breakdown, // each is a review
-  };
-}
+import HomeButton from "./HomeButton";
+import Grid from "@mui/material/Grid";
+import Header from "./Header";
+import SearchBar from "./SearchBar";
+import { courseMetrics } from "./ReviewMetrics";
 
 function Row(props) {
-  const { row } = props;
+  const data = props.data;
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -77,33 +41,56 @@ function Row(props) {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
+
         <TableCell component="th" scope="row">
-          {row.name}
+          {instructorNameEmail(data.instructorName, data.instructorEmail)}
         </TableCell>
-        <TableCell align="right">{row.calories}</TableCell>
-        <TableCell align="right">{row.fat}</TableCell>
-        <TableCell align="right">{row.carbs}</TableCell>
-        <TableCell align="right">{row.protein}</TableCell>
+
+        {courseMetrics.map((metric) => (
+          <TableCell align="center"> {data[metric.id]} </TableCell>
+        ))}
       </TableRow>
+
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
-              <Typography variant="h6" gutterBottom component="div">
-                History
+              <Typography
+                variant="body2"
+                gutterBottom
+                component="div"
+                style={{ fontWeight: "bold" }}
+              >
+                Breakdown of individual reviews
               </Typography>
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Customer</TableCell>
-                    <TableCell align="right">Amount</TableCell>
-                    <TableCell align="right">Total price ($)</TableCell>
+                    <TableCell></TableCell> {/**cell left empty on purpose */}
+                    <TableCell
+                      style={{ top: 57, minWidth: 170 }}
+                    ></TableCell>{" "} {/**cell left empty on purpose */}
+                    {courseMetrics.map((column) => (
+                      <TableCell
+                        key={column.id}
+                        align="center"
+                        style={{ top: 57 }}
+                      >
+                        {column.name}
+                      </TableCell>
+                    ))}
+                    <TableCell
+                    key={"comment"}
+                    align="center"
+                    style={{ top: 57 }}
+                    >
+                    Additional Comment
+                    </TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
-                  {row.breakdown.map((historyRow) => (
+                  {/* {row.breakdown.map((historyRow) => (
                     <TableRow key={historyRow.date}>
                       <TableCell component="th" scope="row">
                         {historyRow.date}
@@ -114,7 +101,7 @@ function Row(props) {
                         {Math.round(historyRow.amount * row.price * 100) / 100}
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ))} */}
                 </TableBody>
               </Table>
             </Box>
@@ -125,40 +112,20 @@ function Row(props) {
   );
 }
 
-Row.propTypes = {
-  row: PropTypes.shape({
-    courseQuality: PropTypes.number.isRequired,
-    instr: PropTypes.number.isRequired,
-    fat: PropTypes.number.isRequired,
-    history: PropTypes.arrayOf(
-      PropTypes.shape({
-        amount: PropTypes.number.isRequired,
-        customerId: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-      })
-    ).isRequired,
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    protein: PropTypes.number.isRequired,
-  }).isRequired,
-};
-
 function Review() {
   const location = useLocation();
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
   const [reviews, setReviews] = React.useState([]);
-  const selectedOption = location.state;
+  const [selectedOption, setSelectedOption] = React.useState(location.state);
 
-  const fetchReviews = async () => {
+  const fetchReviews = async (state) => {
     const res =
-      selectedOption.type === "course"
-        ? await axios.get(
-            `${backendPrefix}/data/review_course/${selectedOption.number}`
-          )
+      state.type === "course"
+        ? await axios.get(`${backendPrefix}/data/review_course/${state.number}`)
         : await axios.get(
-            `${backendPrefix}/data/review_instructor/${selectedOption.email}`
+            `${backendPrefix}/data/review_instructor/${state.email}`
           );
-    console.log(`${backendPrefix}/data/review_course/${selectedOption.number}`);
+
     if (res.status !== 200 || !res.data) {
       console.error("error fetching reviews");
       return;
@@ -168,12 +135,28 @@ function Review() {
   };
 
   React.useEffect(() => {
-    fetchReviews();
+    fetchReviews(location.state);
   }, []);
+
+  React.useEffect(() => {
+    setSelectedOption(location.state);
+    fetchReviews(location.state);
+  }, [location.state]);
+
+  const getAvgData = (array) => {
+    for (let i = 0; i < array.length; i++) {
+      const obj = array[i];
+      if (obj.label === "avg") {
+        return obj;
+      }
+    }
+    return null;
+  };
 
   return (
     <>
-      <h1>BiCo Course Review</h1>
+      <SearchBar />
+
       {selectedOption.type === "course" ? (
         <Typography gutterBottom variant="h5">
           {" "}
@@ -187,46 +170,72 @@ function Review() {
       )}
 
       {!reviews || Object.keys(reviews).length === 0 ? (
-        <Typography gutterBottom variant="body1">
-          There is no review currently. Feel free to contribute one :-{`)`}
-        </Typography>
+        <Grid container justify="center" alignItems="center" spacing={3}>
+          <Grid item xs={12}>
+            <Typography gutterBottom variant="body1">
+              There is no review currently. Feel free to contribute one :-{`)`}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <HomeButton />
+          </Grid>
+        </Grid>
       ) : (
-        Object.keys(reviews).map((sem) => (
-          <Paper sx={{ width: "100%", overflow: "hidden" }}>
-            <TableContainer sx={{ maxHeight: 440 }}>
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell
-                      align="center"
-                      colSpan={9}
-                      style={{ fontSize: "100%", fontWeight: "bold" }}
-                    >
-                      {shortToLongSemester(sem)}
-                    </TableCell>
-                  </TableRow>
+        <Grid container justify="center" alignItems="center" spacing={3}>
+          <Grid item xs={12}>
+            {Object.keys(reviews).map((sem) => (
+              <Paper sx={{ width: "100%", overflow: "hidden" }}>
+                <TableContainer >
+                  <Table stickyHeader>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          colSpan={9}
+                          style={{ fontSize: "100%", fontWeight: "bold" }}
+                        >
+                          {shortToLongSemester(sem)}
+                        </TableCell>
+                      </TableRow>
 
-                  <TableRow>
-                    <TableCell> </TableCell>
-                    {courseReviewColsDef.map((column) => (
-                      <TableCell
-                        key={column.id}
-                        align="center"
-                        style={{ top: 57, minWidth: column.minWidth }}
-                      >
-                        {column.name}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
+                      <TableRow>
+                        <TableCell></TableCell> {/* empty cell on purpose */}
+                        <TableCell
+                          key="instructor"
+                          align="center"
+                          style={{ top: 57, minWidth: 170 }}
+                        >
+                          Instructor
+                        </TableCell>
+                        {courseMetrics.map((column) => (
+                          <TableCell
+                            key={column.id}
+                            align="center"
+                            style={{ top: 57 }}
+                          >
+                            {column.name}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </TableHead>
 
-                <TableBody>
-                  {/* for each  instructor -> a collapsible row */}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        ))
+                    <TableBody>
+                      {Object.keys(reviews[sem]).map((instructor) => (
+                        <Row
+                          data={getAvgData(reviews[sem][instructor])}
+                          label="avg"
+                        />
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+            ))}
+          </Grid>
+          <Grid item xs={12}>
+            <HomeButton />
+          </Grid>
+        </Grid>
       )}
     </>
   );

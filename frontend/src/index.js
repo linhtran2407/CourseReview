@@ -6,22 +6,14 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./error-page";
 import Home from "./components/Home";
 import CourseReviewForm from "./components/CourseReviewForm";
-import SearchBar from "./components/SearchBar";
 import Admin from "./components/Admin";
 import Review from "./components/Review";
-import SemesterTable from "./components/SemesterTable";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
     errorElement: <ErrorPage />,
-    children: [
-      {
-        path: "/",
-        element: <SearchBar />,
-      },
-    ],
   },
   {
     path: "review-course",
@@ -34,10 +26,6 @@ const router = createBrowserRouter([
   {
     path: "search-review",
     element: <Review />,
-  },
-  {
-    path: "test",
-    element: <SemesterTable />,
   },
 ]);
 

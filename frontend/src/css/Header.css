@@ -1,6 +1,11 @@
-.search {
+.header {
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .logo {
+    margin-right: 10px;
     
-}
+    
+  }

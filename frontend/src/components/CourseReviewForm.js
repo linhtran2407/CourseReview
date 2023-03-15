@@ -17,6 +17,8 @@ import { useState } from "react";
 import axios from "axios";
 import AlertDialog from "./AlertDialog";
 import { Check, Send } from "@mui/icons-material";
+import { longToShortSemester, getRatingDescription } from "./Formartter";
+import { courseMetrics } from "./ReviewMetrics";
 
 function CourseReviewForm() {
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
@@ -33,13 +35,13 @@ function CourseReviewForm() {
     instructor: "",
     instructorName: "",
     instructorEmail: "",
-    courseQuality: 1,
-    instructorQuality: 1,
-    difficulty: 1,
-    workRequired: 1,
-    amountLearned: 1,
-    recMajor: 1,
-    recMinor: 1,
+    courseQuality: 3,
+    instructorQuality: 3,
+    difficulty: 3,
+    workRequired: 3,
+    amountLearned: 3,
+    recMajor: 3,
+    recMinor: 3,
     comment: "",
   });
 
@@ -61,7 +63,7 @@ function CourseReviewForm() {
       },
     });
 
-    if (res.status !== 200 && res.status !== 201 || !res.data) {
+    if ((res.status !== 200 && res.status !== 201) || !res.data) {
       console.error("error saving course review: " + res.status);
       return;
     }
@@ -93,7 +95,7 @@ function CourseReviewForm() {
     if (formData.semester) {
       // reset course and instructor + reload list of courses
       // when semester changes
-      const semesterCode = standardizeSemester(formData.semester);
+      const semesterCode = longToShortSemester(formData.semester);
       setFormData({
         ...formData,
         course: "",
@@ -115,15 +117,6 @@ function CourseReviewForm() {
       setFormattedCoursesBySem(Array.from(set));
     }
   }, [coursesBySem]);
-
-  // convert all semester to correct format in the DB
-  // eg: Fall 2021 -> f21, Spring 2023 -> s23
-  function standardizeSemester(semester) {
-    const [term, year] = semester.split(" ");
-    const shortTerm = term.charAt(0).toLowerCase();
-    const shortYear = year.slice(-2);
-    return `${shortTerm}${shortYear}`;
-  }
 
   // fetch all (BMC) instructors by selected semester and coures
   const [instructorsBySemCourse, setInstructorsBySemCourse] = React.useState(
@@ -313,157 +306,35 @@ function CourseReviewForm() {
         {hasRequiredFields() ? (
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2}>
-              <Grid container item spacing={2}>
-                <Grid item xs={2}>
-                  <Typography>Course Quality</Typography>
-                </Grid>
-                <Grid item>
-                  <Slider
-                    sx={{ width: 300, height: 10 }}
-                    onChange={handleChange}
-                    aria-label="Course Quality"
-                    defaultValue={3}
-                    name="courseQuality"
-                    value={formData.courseQuality}
-                    valueLabelDisplay="auto"
-                    step={1}
-                    marks
-                    min={1}
-                    max={5}
-                    required
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid container item spacing={2}>
-                <Grid item xs={2}>
-                  <Typography>Instructor Quality</Typography>
-                </Grid>
-                <Grid item>
-                  <Slider
-                    sx={{ width: 300, height: 10 }}
-                    onChange={handleChange}
-                    aria-label="Instructor Quality"
-                    defaultValue={3}
-                    name="instructorQuality"
-                    value={formData.instructorQuality}
-                    valueLabelDisplay="auto"
-                    step={1}
-                    marks
-                    min={1}
-                    max={5}
-                    required
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid container item spacing={2}>
-                <Grid item xs={2}>
-                  <Typography>Difficulty</Typography>
-                </Grid>
-                <Grid item>
-                  <Slider
-                    sx={{ width: 300, height: 10 }}
-                    onChange={handleChange}
-                    aria-label="Difficulty"
-                    defaultValue={3}
-                    name="difficulty"
-                    value={formData.difficulty}
-                    valueLabelDisplay="auto"
-                    step={1}
-                    marks
-                    min={1}
-                    max={5}
-                    required
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid container item spacing={2}>
-                <Grid item xs={2}>
-                  <Typography>Work Required</Typography>
-                </Grid>
-                <Grid item>
-                  <Slider
-                    sx={{ width: 300, height: 10 }}
-                    onChange={handleChange}
-                    aria-label="Work Required"
-                    defaultValue={3}
-                    name="workRequired"
-                    value={formData.workRequired}
-                    valueLabelDisplay="auto"
-                    step={1}
-                    marks
-                    min={1}
-                    max={5}
-                    required
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid container item spacing={2}>
-                <Grid item xs={2}>
-                  <Typography>Amount Learned</Typography>
-                </Grid>
-                <Grid item>
-                  <Slider
-                    sx={{ width: 300, height: 10 }}
-                    onChange={handleChange}
-                    aria-label="Amount Learned"
-                    defaultValue={3}
-                    name="amountLearned"
-                    value={formData.amountLearned}
-                    valueLabelDisplay="auto"
-                    step={1}
-                    marks
-                    min={1}
-                    max={5}
-                    required
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid container item spacing={2}>
-                <Grid item xs={2}>
-                  <Typography>Recommend for Major</Typography>
-                </Grid>
-                <Grid item>
-                  <Slider
-                    sx={{ width: 300, height: 10 }}
-                    onChange={handleChange}
-                    aria-label="Recommend Major"
-                    defaultValue={3}
-                    name="recMajor"
-                    value={formData.recMajor}
-                    valueLabelDisplay="auto"
-                    step={1}
-                    marks
-                    min={1}
-                    max={5}
-                  />
-                </Grid>
-              </Grid>
-
-              <Grid container item spacing={2}>
-                <Grid item xs={2}>
-                  <Typography>Recommend for Minor</Typography>
-                </Grid>
-                <Grid item>
-                  <Slider
-                    sx={{ width: 300, height: 10 }}
-                    onChange={handleChange}
-                    aria-label="Recommend Minor"
-                    defaultValue={3}
-                    name="recMinor"
-                    value={formData.recMinor}
-                    valueLabelDisplay="auto"
-                    step={1}
-                    marks
-                    min={1}
-                    max={5}
-                  />
-                </Grid>
-              </Grid>
+              {courseMetrics.map((metric) => {
+                return (
+                  <Grid container item spacing={2}>
+                    <Grid item xs={3}>
+                      <Typography>{metric.name}</Typography>
+                    </Grid>
+                    <Grid item>
+                      <Slider
+                        sx={{ width: 300, height: 10 }}
+                        onChange={handleChange}
+                        aria-label={metric.name}
+                        defaultValue={3}
+                        name={metric.id}
+                        value={formData[metric.id]}
+                        valueLabelDisplay="auto"
+                        valueLabelFormat={getRatingDescription(
+                          formData[metric.id],
+                          metric.id
+                        )}
+                        step={1}
+                        marks
+                        min={1}
+                        max={5}
+                        required
+                      />
+                    </Grid>
+                  </Grid>
+                );
+              })}
 
               <Grid container item spacing={2}>
                 <FormControl
@@ -501,15 +372,13 @@ function CourseReviewForm() {
             Submit
           </Button>
 
-          
-
           <Button
             xs={2}
             variant="contained"
             color="error"
             type="submit"
             onClick={() => navigate("/")}
-            endIcon={<Check/>}
+            endIcon={<Check />}
           >
             Cancel
           </Button>

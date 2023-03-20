@@ -16,13 +16,15 @@ router.post("/course", async (req, res) => {
       difficulty: req.body.difficulty,
       workRequired: req.body.workRequired,
       amountLearned: req.body.amountLearned,
-      recMajor: req.body.recMajor,
-      recMinor: req.body.recMinor,
+      stimulateInterest: req.body.stimulateInterest,
+      instructorAccess: req.body.instructorAccess,
       comment: req.body.comment,
       status: 0, // pending
     });
+
     const savedCourseReview = await courseReview.save();
     res.status(201).json(savedCourseReview);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

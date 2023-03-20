@@ -7,6 +7,16 @@ const {
   instructorReviewModel,
 } = require("../models/models");
 
+const courseReviewMetrics = [
+  "courseQuality",
+  "instructorQuality",
+  "difficulty",
+  "workRequired",
+  "amountLearned",
+  "stimulateInterest",
+  "instructorAccess",
+];
+
 // get lists of unique courses and instructors for the searching bar
 router.get("/courseAndInstructor", async (req, res) => {
   try {
@@ -89,9 +99,6 @@ router.get("/bmc_instructors/:dept/:lastName", async (req, res) => {
 });
 
 // get all reviews of course with courseNumber
-// grouped by semester, then by instructor
-// and sorted in reverse chronological order
-// and append a object containing average scores in result
 router.get("/review_course/:courseNumber", async (req, res) => {
   try {
     const reviews = await courseReviewModel.find({
@@ -99,96 +106,74 @@ router.get("/review_course/:courseNumber", async (req, res) => {
       status: 1, // approved
     });
 
-    // group reviews by semester
-    const groupResult = reviews.reduce((acc, curr) => {
-      const semester = curr.semester;
-      if (!acc[semester]) {
-        acc[semester] = [];
+    // sort reviews by semester in reverse chronological order
+    reviews.sort((a, b) => {
+      const semA = a.semester;
+      const semB = b.semester;
+      const yearA = parseInt(semA.slice(1));
+      const yearB = parseInt(semB.slice(1));
+      const semesterA = semA.charAt(0) === "f" ? 1 : 0;
+      const semesterB = semB.charAt(0) === "f" ? 1 : 0;
+
+      if (yearA === yearB) {
+        return semesterB - semesterA;
+      } else {
+        return yearB - yearA;
       }
-      acc[semester].push(curr);
-      return acc;
-    }, {});
-
-    // sort semesters in reverse chronological order
-    const sortResult = Object.keys(groupResult)
-      .sort((a, b) => {
-        const yearA = parseInt(a.slice(1));
-        const yearB = parseInt(b.slice(1));
-        const semesterA = a.charAt(0) === "f" ? 0 : 1;
-        const semesterB = b.charAt(0) === "f" ? 0 : 1;
-
-        if (yearA === yearB) {
-          return semesterB - semesterA;
-        } else {
-          return yearB - yearA;
-        }
-      })
-      .reduce((acc, semester) => {
-        acc[semester] = groupResult[semester];
-        return acc;
-      }, {});
-
-    // group reviews in each semester by instructor
-    const updatedResult = Object.keys(sortResult).reduce((acc, semester) => {
-      const semesterGroups = sortResult[semester];
-      const instructorMap = semesterGroups.reduce((instructors, group) => {
-        const email = group.instructorEmail;
-        if (!instructors[email]) {
-          instructors[email] = [];
-        }
-        instructors[email].push(group);
-        return instructors;
-      }, {});
-      acc[semester] = instructorMap;
-      return acc;
-    }, {});
-
-    Object.keys(updatedResult).forEach((sem) => {
-      const instructorMaps = updatedResult[sem];
-      Object.keys(instructorMaps).forEach((instructor) => {
-        const averages = computeAverages(instructorMaps[instructor]);
-        averages.label = "avg"; // add a label for object containing averages
-        instructorMaps[instructor].push(averages);
-      });
     });
 
-    res.status(200).json(updatedResult);
+    const averages = {};
+
+    // group reviews by key being semester-instructor email
+    const grouped = reviews.reduce((res, review) => {
+      const key = `${review.semester}-${review.instructorEmail}`;
+      if (!res[key]) {
+        res[key] = [];
+        averages[key] = {};
+        const obj = review.toObject();
+        for (const field in obj) {
+          if (!courseReviewMetrics.includes(field) && field !== "comment") { // remove comment field for simplicity
+            averages[key][field] = obj[field];
+          }
+        }
+      }
+
+      res[key].push(review);
+      return res;
+    }, {});
+
+    Object.keys(grouped).reduce((res, key) => {
+      const avg = computeAverages(grouped[key]);
+      for (const field of courseReviewMetrics) {
+        averages[key][field] = avg[field];
+      }
+    }, {});
+
+    const arr = {
+      grouped: grouped,
+      averages: averages,
+    };
+
+    res.status(200).json(arr);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
   }
 });
 
-function computeAverages(list) {
-  const fields = [
-    "instructorName",
-    "instructorEmail",
-    "courseQuality",
-    "instructorQuality",
-    "difficulty",
-    "workRequired",
-    "amountLearned",
-    "recMajor",
-    "recMinor",
-  ];
-  const result = list.reduce((acc, curr) => {
-    for (let key of fields) {
-      if (key.startsWith("instructor")) {
-        acc[key] = curr[key];
-      } else {
-        acc[key] = (acc[key] || 0) + curr[key];
-
-      }
+function computeAverages(reviews) {
+  const res = reviews.reduce((acc, curr) => {
+    for (let key of courseReviewMetrics) {
+      acc[key] = (acc[key] || 0) + curr[key];
     }
     return acc;
   }, {});
 
-  for (let key in result) {
-    if (key.startsWith("instructor")) { continue; }
-    result[key] = +(result[key] / list.length).toFixed(2);
+  for (let key in res) {
+    res[key] = +(res[key] / reviews.length).toFixed(2);
   }
 
-  return result;
+  return res;
 }
 
 router.get("/review_instructor/:instructorEmail", async (req, res) => {

@@ -28,8 +28,8 @@ const courseReviewSchema = new mongoose.Schema({
   difficulty: { type: Number, required: true },
   workRequired: { type: Number, required: true },
   amountLearned: { type: Number, required: true },
-  recMajor: { type: Number },
-  recMinor: { type: Number },
+  stimulateInterest: { type: Number },
+  instructorAccess: { type: Number },
   comment: { type: String },
   status: { type: Number }, // 0: pending, 1: approved, 2: rejected
 });

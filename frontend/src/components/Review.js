@@ -9,10 +9,6 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Box from "@mui/material/Box";
-import Collapse from "@mui/material/Collapse";
-import IconButton from "@mui/material/IconButton";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import {
   fullCourseName,
   instructorNameEmail,
@@ -21,15 +17,16 @@ import {
 import { TableBody } from "@mui/material";
 import HomeButton from "./HomeButton";
 import Grid from "@mui/material/Grid";
-import Header from "./Header";
 import SearchBar from "./SearchBar";
 import { courseMetrics } from "./ReviewMetrics";
+import "../css/Review.css";
 
 function Review() {
   const location = useLocation();
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
   const [reviews, setReviews] = React.useState([]);
   const [selectedOption, setSelectedOption] = React.useState(location.state);
+  const [clickedRow, setClickedRow] = React.useState(null);
 
   const fetchReviews = async (state) => {
     const res =
@@ -52,19 +49,10 @@ function Review() {
   }, []);
 
   React.useEffect(() => {
+    setClickedRow(null);
     setSelectedOption(location.state);
     fetchReviews(location.state);
   }, [location.state]);
-
-  const getAvgData = (array) => {
-    for (let i = 0; i < array.length; i++) {
-      const obj = array[i];
-      if (obj.label === "avg") {
-        return obj;
-      }
-    }
-    return null;
-  };
 
   return (
     <>
@@ -82,7 +70,7 @@ function Review() {
         </Typography>
       )}
 
-      {!reviews || Object.keys(reviews).length === 0 ? (
+      {!reviews || !reviews["grouped"] || Object.keys(reviews["grouped"]).length === 0 ? (
         <Grid container justify="center" alignItems="center" spacing={3}>
           <Grid item xs={12}>
             <Typography gutterBottom variant="body1">
@@ -94,67 +82,133 @@ function Review() {
           </Grid>
         </Grid>
       ) : (
-        <Grid container justify="center" alignItems="center" spacing={3}>
-          <Grid item xs={12}>
-            {Object.keys(reviews).map((sem) => (
-              <Paper sx={{ width: "100%", overflow: "hidden" }}>
-                <TableContainer>
-                  <Table stickyHeader>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell
-                          align="center"
-                          colSpan={9}
-                          style={{ fontSize: "100%", fontWeight: "bold" }}
-                        >
-                          {shortToLongSemester(sem)}
-                        </TableCell>
-                      </TableRow>
+        <>
+          <Box className="box">
+            <Paper
+              className="reviewTables"
+              sx={{ width: "100%", overflow: "hidden" }}
+            >
+              <TableContainer>
+                <Table stickyHeader sx={{ border: "2px solid whitesmoke" }}>
+                  <TableHead sx={{ fontWeight: "bold", fontSize: "17px" }}>
+                    Metric Averages
+                  </TableHead>
+                  <TableRow>
+                    <TableCell align="center" className="reviewTableHeader">
+                      Semester
+                    </TableCell>
+                    <TableCell
+                      key="instructor"
+                      align="center"
+                      className="reviewTableHeader"
+                      style={{ width: "20%" }}
+                    >
+                      Instructor
+                    </TableCell>
+                    {courseMetrics.map((column) => (
+                      <TableCell
+                        key={column.id}
+                        align="center"
+                        className="reviewTableHeader"
+                      >
+                        {column.name}
+                      </TableCell>
+                    ))}
+                  </TableRow>
 
-                      <TableRow>
-                        <TableCell
-                          key="instructor"
-                          align="center"
-                          style={{ top: 57, minWidth: 170 }}
+                  <TableBody>
+                    {Object.keys(reviews["averages"]).map((key) => {
+                      const data = reviews["averages"][key];
+                      console.log(data);
+
+                      return (
+                        <TableRow
+                          onClick={() => {
+                            setClickedRow(key);
+                            console.log("fdhjksa");
+                            // color to blue
+                          }}
+                          hover
+                          selected={clickedRow === key}
+                          sx={{ "& > *": { borderBottom: "unset" } }}
                         >
-                          Instructor
-                        </TableCell>
-                        {courseMetrics.map((column) => (
-                          <TableCell
-                            key={column.id}
-                            align="center"
-                            style={{ top: 57 }}
-                          >
-                            {column.name}
+                          <TableCell>
+                            {shortToLongSemester(data.semester)}
                           </TableCell>
-                        ))}
-                      </TableRow>
+                          <TableCell component="th" scope="row">
+                            {instructorNameEmail(
+                              data.instructorName,
+                              data.instructorEmail
+                            )}
+                          </TableCell>
+
+                          {courseMetrics.map((metric) => (
+                            <TableCell align="center">
+                              {" "}
+                              {data[metric.id]}{" "}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+
+            {clickedRow ? (
+              <Paper className="detailTable">
+                <TableContainer>
+                  <Table stickyHeader sx={{ border: "2px solid whitesmoke" }}>
+                    <TableHead sx={{ fontWeight: "bold", fontSize: "17px" }}>
+                      Individual Reviews
                     </TableHead>
 
+                    <TableRow>
+                      <TableCell
+                        align="center"
+                        className="reviewTableHeader"
+                        style={{ width: "1px" }}
+                      >
+                        No.
+                      </TableCell>
+                      {courseMetrics.map((column) => (
+                        <TableCell
+                          key={column.id}
+                          align="center"
+                          className="reviewTableHeader"
+                        >
+                          {column.name}
+                        </TableCell>
+                      ))}
+                      <TableCell
+                        align="center"
+                        style={{ width: "30%" }}
+                        className="reviewTableHeader"
+                      >
+                        Additional Comment
+                      </TableCell>
+                    </TableRow>
+
                     <TableBody>
-                      {Object.keys(reviews[sem]).map((instructor) => {
-                        const data = getAvgData(reviews[sem][instructor]);
+                      {reviews["grouped"][clickedRow] && reviews["grouped"][clickedRow].map((review, idx) => {
                         return (
                           <TableRow
-                            onClick={() => {
-                              console.log("clicked");
-                            }}
                             hover
                             sx={{ "& > *": { borderBottom: "unset" } }}
                           >
-                            <TableCell component="th" scope="row">
-                              {instructorNameEmail(
-                                data.instructorName,
-                                data.instructorEmail
-                              )}
-                            </TableCell>
+                            <TableCell align="center">{idx + 1}.</TableCell>
 
                             {courseMetrics.map((metric) => (
                               <TableCell align="center">
                                 {" "}
-                                {data[metric.id]}{" "}
+                                {review[metric.id]}{" "}
                               </TableCell>
                             ))}
+
+                            <TableCell align="center">
+                              {review["comment"]}
+                            </TableCell>
                           </TableRow>
                         );
                       })}
@@ -162,12 +216,11 @@ function Review() {
                   </Table>
                 </TableContainer>
               </Paper>
-            ))}
-          </Grid>
-          <Grid item xs={12}>
-            <HomeButton />
-          </Grid>
-        </Grid>
+            ) : null}
+          </Box>
+
+          <HomeButton />
+        </>
       )}
     </>
   );

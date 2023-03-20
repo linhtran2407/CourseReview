@@ -40,8 +40,8 @@ function CourseReviewForm() {
     difficulty: 3,
     workRequired: 3,
     amountLearned: 3,
-    recMajor: 3,
-    recMinor: 3,
+    stimulateInterest: 3,
+    instructorAccess: 3,
     comment: "",
   });
 
@@ -356,6 +356,7 @@ function CourseReviewForm() {
             </Grid>
           </Box>
         ) : null}
+
         <AlertDialog
           open={submissionAlert}
           handleClose={closeSubmissionAlert}

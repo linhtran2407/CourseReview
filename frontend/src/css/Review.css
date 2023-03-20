@@ -1,0 +1,24 @@
+.box {
+    margin-top: 35px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+    flex-direction: column;
+    background-color: whitesmoke;
+}
+
+.reviewTables {
+    width: fill-available;
+    height: 50%;
+}
+
+.reviewTableHeader {
+    font-size: 17px !important;
+    font-weight: bold !important;
+}
+
+.detailTable {
+    margin-top: 35px;
+    height: 50%;
+}

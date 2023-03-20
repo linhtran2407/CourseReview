@@ -4,6 +4,6 @@ export const courseMetrics = [
   { id: "difficulty", name: "Difficulty" },
   { id: "workRequired", name: "Work Required" },
   { id: "amountLearned", name: "Amount Learned" },
-  { id: "recMajor", name: "Recommend Major" },
-  { id: "recMinor", name: "Recommend Minor" },
+  { id: "stimulateInterest", name: "Stimulate Interest" },
+  { id: "instructorAccess", name: "Instructor Access" },
 ];

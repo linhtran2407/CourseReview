@@ -37,7 +37,7 @@ export function showStatus(status) {
 }
 
 export function getRatingDescription(rate, field) {
-  if (field === "courseQuality" || field === "instructorQuality") {
+  if (field === "courseQuality" || field === "instructorQuality" || field === "instructorAccess") {
     switch (rate) {
       case 1:
         return "Very Poor";
@@ -67,7 +67,7 @@ export function getRatingDescription(rate, field) {
       default:
         return "Invalid rating";
     }
-  } else if (field === "workRequired" || field === "amountLearned") {
+  } else if (field === "workRequired" || field === "amountLearned" || field === "stimulateInterest") {
     switch (rate) {
       case 1:
         return "Very Little";

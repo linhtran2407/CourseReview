@@ -7,7 +7,8 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import { Delete, DoneAllRounded } from "@mui/icons-material";
 import axios from "axios";
-import { shortToLongSemester, fullCourseName, showStatus } from "./Formartter";
+import { shortToLongSemester, fullCourseName, showStatus, instructorNameEmail } from "./Formartter";
+import { courseMetrics } from "./ReviewMetrics";
 
 function CourseReview({ review, idx, onDelete, isAdmin }) {
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
@@ -61,29 +62,15 @@ function CourseReview({ review, idx, onDelete, isAdmin }) {
           {shortToLongSemester(review.semester)}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Instructor: {review.instructorName} - {review.instructorEmail}
+          {instructorNameEmail(review.instructorName, review.instructorEmail)}
         </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Course Quality: {review.courseQuality}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Instructor Quality: {review.instructorQuality}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Difficulty: {review.difficulty}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Work Required: {review.workRequired}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Amount Learned: {review.amountLearned}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Rec for Major: {review.recMajor}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Rec for Minor: {review.recMinor}
-        </Typography>
+
+        {courseMetrics.map((metric) => (
+          <Typography variant="body2" color="text.secondary">
+            {metric.name}: {review[metric.id]}
+          </Typography>
+        ))}
+
         <Typography variant="body2" color="text.secondary">
           Comment: {review.comment}
         </Typography>

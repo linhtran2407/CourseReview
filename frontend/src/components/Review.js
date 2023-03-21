@@ -20,6 +20,7 @@ import Grid from "@mui/material/Grid";
 import SearchBar from "./SearchBar";
 import { courseMetrics } from "./ReviewMetrics";
 import "../css/Review.css";
+import { maxHeight } from "@mui/system";
 
 function Review() {
   const location = useLocation();
@@ -56,21 +57,25 @@ function Review() {
 
   return (
     <>
-      <SearchBar />
+      <div className="nav-bar">
+        <SearchBar />
+      </div>
 
       {selectedOption.type === "course" ? (
-        <Typography gutterBottom variant="h5">
+        <Typography className="title" gutterBottom variant="h5">
           {" "}
           {fullCourseName(selectedOption.name, selectedOption.number, "B")}{" "}
         </Typography>
       ) : (
-        <Typography gutterBottom variant="h5">
+        <Typography className="title" gutterBottom variant="h5">
           {" "}
           {instructorNameEmail(selectedOption.name, selectedOption.email)}{" "}
         </Typography>
       )}
 
-      {!reviews || !reviews["grouped"] || Object.keys(reviews["grouped"]).length === 0 ? (
+      {!reviews ||
+      !reviews["grouped"] ||
+      Object.keys(reviews["grouped"]).length === 0 ? (
         <Grid container justify="center" alignItems="center" spacing={3}>
           <Grid item xs={12}>
             <Typography gutterBottom variant="body1">
@@ -82,95 +87,29 @@ function Review() {
           </Grid>
         </Grid>
       ) : (
-        <>
-          <Box className="box">
-            <Paper
-              className="reviewTables"
-              sx={{ width: "100%", overflow: "hidden" }}
-            >
-              <TableContainer>
-                <Table stickyHeader sx={{ border: "2px solid whitesmoke" }}>
-                  <TableHead sx={{ fontWeight: "bold", fontSize: "17px" }}>
-                    Metric Averages
-                  </TableHead>
-                  <TableRow>
-                    <TableCell align="center" className="reviewTableHeader">
-                      Semester
-                    </TableCell>
-                    <TableCell
-                      key="instructor"
-                      align="center"
-                      className="reviewTableHeader"
-                      style={{ width: "20%" }}
-                    >
-                      Instructor
-                    </TableCell>
-                    {courseMetrics.map((column) => (
-                      <TableCell
-                        key={column.id}
-                        align="center"
-                        className="reviewTableHeader"
-                      >
-                        {column.name}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-
-                  <TableBody>
-                    {Object.keys(reviews["averages"]).map((key) => {
-                      const data = reviews["averages"][key];
-                      console.log(data);
-
-                      return (
-                        <TableRow
-                          onClick={() => {
-                            setClickedRow(key);
-                            console.log("fdhjksa");
-                            // color to blue
-                          }}
-                          hover
-                          selected={clickedRow === key}
-                          sx={{ "& > *": { borderBottom: "unset" } }}
-                        >
-                          <TableCell>
-                            {shortToLongSemester(data.semester)}
-                          </TableCell>
-                          <TableCell component="th" scope="row">
-                            {instructorNameEmail(
-                              data.instructorName,
-                              data.instructorEmail
-                            )}
-                          </TableCell>
-
-                          {courseMetrics.map((metric) => (
-                            <TableCell align="center">
-                              {" "}
-                              {data[metric.id]}{" "}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
-
-            {clickedRow ? (
-              <Paper className="detailTable">
+        <div>
+          <div>
+            <Box className="box">
+              <Paper
+                className="reviewTables"
+                sx={{ width: "100%", overflow: "hidden" }}
+              >
                 <TableContainer>
                   <Table stickyHeader sx={{ border: "2px solid whitesmoke" }}>
                     <TableHead sx={{ fontWeight: "bold", fontSize: "17px" }}>
-                      Individual Reviews
+                      Metric Averages
                     </TableHead>
-
                     <TableRow>
+                      <TableCell align="center" className="reviewTableHeader">
+                        Semester
+                      </TableCell>
                       <TableCell
+                        key="instructor"
                         align="center"
                         className="reviewTableHeader"
-                        style={{ width: "1px" }}
+                        style={{ width: "20%" }}
                       >
-                        No.
+                        Instructor
                       </TableCell>
                       {courseMetrics.map((column) => (
                         <TableCell
@@ -181,34 +120,40 @@ function Review() {
                           {column.name}
                         </TableCell>
                       ))}
-                      <TableCell
-                        align="center"
-                        style={{ width: "30%" }}
-                        className="reviewTableHeader"
-                      >
-                        Additional Comment
-                      </TableCell>
                     </TableRow>
 
                     <TableBody>
-                      {reviews["grouped"][clickedRow] && reviews["grouped"][clickedRow].map((review, idx) => {
+                      {Object.keys(reviews["averages"]).map((key) => {
+                        const data = reviews["averages"][key];
+                        console.log(data);
+
                         return (
                           <TableRow
+                            onClick={() => {
+                              setClickedRow(key);
+                              console.log("fdhjksa");
+                              // color to blue
+                            }}
                             hover
+                            selected={clickedRow === key}
                             sx={{ "& > *": { borderBottom: "unset" } }}
                           >
-                            <TableCell align="center">{idx + 1}.</TableCell>
+                            <TableCell>
+                              {shortToLongSemester(data.semester)}
+                            </TableCell>
+                            <TableCell component="th" scope="row">
+                              {instructorNameEmail(
+                                data.instructorName,
+                                data.instructorEmail
+                              )}
+                            </TableCell>
 
                             {courseMetrics.map((metric) => (
                               <TableCell align="center">
                                 {" "}
-                                {review[metric.id]}{" "}
+                                {data[metric.id]}{" "}
                               </TableCell>
                             ))}
-
-                            <TableCell align="center">
-                              {review["comment"]}
-                            </TableCell>
                           </TableRow>
                         );
                       })}
@@ -216,11 +161,76 @@ function Review() {
                   </Table>
                 </TableContainer>
               </Paper>
-            ) : null}
-          </Box>
 
-          <HomeButton />
-        </>
+              {clickedRow ? (
+                <Paper className="detailTable">
+                  <TableContainer>
+                    <Table stickyHeader sx={{ border: "2px solid whitesmoke" }}>
+                      <TableHead sx={{ fontWeight: "bold", fontSize: "17px" }}>
+                        Individual Reviews
+                      </TableHead>
+
+                      <TableRow>
+                        <TableCell
+                          align="center"
+                          className="reviewTableHeader"
+                          style={{ width: "1px" }}
+                        >
+                          No.
+                        </TableCell>
+                        {courseMetrics.map((column) => (
+                          <TableCell
+                            key={column.id}
+                            align="center"
+                            className="reviewTableHeader"
+                          >
+                            {column.name}
+                          </TableCell>
+                        ))}
+                        <TableCell
+                          align="center"
+                          style={{ width: "30%" }}
+                          className="reviewTableHeader"
+                        >
+                          Additional Comment
+                        </TableCell>
+                      </TableRow>
+
+                      <TableBody>
+                        {reviews["grouped"][clickedRow] &&
+                          reviews["grouped"][clickedRow].map((review, idx) => {
+                            return (
+                              <TableRow
+                                hover
+                                sx={{ "& > *": { borderBottom: "unset" } }}
+                              >
+                                <TableCell align="center">{idx + 1}.</TableCell>
+
+                                {courseMetrics.map((metric) => (
+                                  <TableCell align="center">
+                                    {" "}
+                                    {review[metric.id]}{" "}
+                                  </TableCell>
+                                ))}
+                                <TableCell>
+                                  <div className="comment">
+                                    {review["comment"]}
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Paper>
+              ) : null}
+            </Box>
+          </div>
+          <div className="home-button">
+            <HomeButton />
+          </div>
+        </div>
       )}
     </>
   );

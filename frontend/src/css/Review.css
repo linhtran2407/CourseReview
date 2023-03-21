@@ -22,3 +22,22 @@
     margin-top: 35px;
     height: 50%;
 }
+
+.home-button {
+    margin-top: 35px !important;
+}
+
+.title {
+    font-weight: bold !important;
+    justify-content: center;
+}
+
+.nav-bar {
+    margin-bottom: 35px;
+}
+
+.comment {
+    min-height: 52px;
+    max-height: 120px; 
+    overflow: auto;
+}

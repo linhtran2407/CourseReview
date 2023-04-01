@@ -161,13 +161,21 @@ function CourseReviewForm() {
       const matchingCourseObj = coursesBySem.find(
         (obj) => obj.format === formData.course
       );
-      setFormData({
-        ...formData,
-        courseNumber: matchingCourseObj.number,
-        courseTitle: matchingCourseObj.title,
-      });
-      // reload list of instructors when course changes
-      fetchInstructorsBySemCourse();
+      if (matchingCourseObj) {
+        setFormData({
+          ...formData,
+          courseNumber: matchingCourseObj.number,
+          courseTitle: matchingCourseObj.title,
+        });
+        // reload list of instructors when course changes
+        fetchInstructorsBySemCourse();
+      } else {
+        setFormData({
+          ...formData,
+          courseNumber: "",
+          courseTitle: "",
+        });
+      }
     }
   }, [formData.course]);
 

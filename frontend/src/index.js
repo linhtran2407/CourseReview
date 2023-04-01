@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./error-page";
 import Home from "./components/Home";
 import CourseReviewForm from "./components/CourseReviewForm";
+import InstructorReviewForm from "./components/InstructorReviewForm";
 import Admin from "./components/Admin";
 import Review from "./components/Review";
 
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
   {
     path: "search-review",
     element: <Review />,
+  },
+  {
+    path: "review-instructor",
+    element: <InstructorReviewForm />,
   },
 ]);
 

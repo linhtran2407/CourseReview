@@ -37,7 +37,7 @@ export function showStatus(status) {
 }
 
 export function getRatingDescription(rate, field) {
-  if (field === "courseQuality" || field === "instructorQuality" || field === "instructorAccess") {
+  if (field === "courseQuality" || field === "instructorQuality" || field === "instructorAccess" || field === "overAllRating") {
     switch (rate) {
       case 1:
         return "Very Poor";

@@ -31,4 +31,33 @@ router.post("/course", async (req, res) => {
   }
 });
 
+router.post("/instructor", async (req, res) => {
+  try {
+    console.log(req.body);
+    // const courseReview = new courseReviewModel({
+    //   courseTitle: req.body.courseTitle,
+    //   courseNumber: req.body.courseNumber,
+    //   semester: req.body.semesterCode,
+    //   instructorName: req.body.instructorName,
+    //   instructorEmail: req.body.instructorEmail,
+    //   courseQuality: req.body.courseQuality,
+    //   instructorQuality: req.body.instructorQuality,
+    //   difficulty: req.body.difficulty,
+    //   workRequired: req.body.workRequired,
+    //   amountLearned: req.body.amountLearned,
+    //   stimulateInterest: req.body.stimulateInterest,
+    //   instructorAccess: req.body.instructorAccess,
+    //   comment: req.body.comment,
+    //   status: 0, // pending
+    // });
+
+    // const savedCourseReview = await courseReview.save();
+    // res.status(201).json(savedCourseReview);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;

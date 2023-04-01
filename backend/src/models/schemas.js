@@ -36,11 +36,29 @@ const courseReviewSchema = new mongoose.Schema({
 
 const instructorReviewSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  email: { type: String, required: true },
   department: { type: String, required: true },
-  courses: [courseReviewSchema],
-  avgCourseQuality: { type: Number, required: true },
-  avgInstructorQuality: { type: Number, required: true },
-  avgDifficulty: { type: Number, required: true },
+  // courses: [courseReviewSchema], // todo
+  overallRating: { type: Number, required: true },
+  clearCommunication: { type: Boolean},
+  responsive: { type: Boolean},
+  inspiring: { type: Boolean},
+  engaging: { type: Boolean},
+  caring: { type: Boolean},
+  createWelcomingEnv: { type: Boolean},
+  lectureHeavy: { type: Boolean},
+  testHeavy: { type: Boolean},
+  readingHeavy: { type: Boolean},
+  giveGoodFeedback: { type: Boolean},
+  organized: { type: Boolean},
+  accessibleOutsideClass: { type: Boolean},
+  assignsUsefulProjects: { type: Boolean},
+  offersExtraCredit: { type: Boolean},
+  fairGrader: { type: Boolean},
+  toughGrader: { type: Boolean},
+  classesTaken: { type: [String] },
+  comment: { type: String },
+  status: { type: Number }, // 0: pending, 1: approved, 2: rejected
 });
 
 module.exports = {

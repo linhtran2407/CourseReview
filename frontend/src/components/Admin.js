@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Box, TextField, Alert, Button } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import axios from "axios";
-import CourseReview from "./CourseReview";
-import { Home, TagFaces } from "@mui/icons-material";
+import CourseReviewCard from "./CourseReviewCard";
+import { TagFaces } from "@mui/icons-material";
 
 import HomeButton from "./HomeButton";
 
@@ -102,7 +102,7 @@ function Admin() {
     <Grid container justify="center" alignItems="center" spacing={3}>
       {courseReviews.map((review, idx) => (
         <Grid item xs={12} sm={6} md={4} key={review._id}>
-          <CourseReview
+          <CourseReviewCard
             review={review}
             idx={idx}
             onDelete={() => handleDelete(idx)}

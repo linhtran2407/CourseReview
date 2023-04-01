@@ -20,7 +20,6 @@ import Grid from "@mui/material/Grid";
 import SearchBar from "./SearchBar";
 import { courseMetrics } from "./ReviewMetrics";
 import "../css/Review.css";
-import { maxHeight } from "@mui/system";
 
 function Review() {
   const location = useLocation();

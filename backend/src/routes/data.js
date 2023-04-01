@@ -79,6 +79,18 @@ router.get("/bmc_courses/:semester", async (req, res) => {
   }
 });
 
+// get all BMC instructors
+// assume instructors in DB are unique by email
+router.get("/bmc_instructors", async (req, res) => {
+  try {
+    const instructors = await BMCCInstructorModel.find({});
+    res.status(200).json(instructors);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
 // get BMC instructors by department and last name
 router.get("/bmc_instructors/:dept/:lastName", async (req, res) => {
   try {
@@ -175,6 +187,8 @@ function computeAverages(reviews) {
 
   return res;
 }
+
+
 
 router.get("/review_instructor/:instructorEmail", async (req, res) => {
   try {

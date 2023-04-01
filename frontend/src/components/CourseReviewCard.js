@@ -10,7 +10,7 @@ import axios from "axios";
 import { shortToLongSemester, fullCourseName, showStatus, instructorNameEmail } from "./Formartter";
 import { courseMetrics } from "./ReviewMetrics";
 
-function CourseReview({ review, idx, onDelete, isAdmin }) {
+function CourseReviewCard({ review, idx, onDelete, isAdmin }) {
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
 
   const colors = [
@@ -96,4 +96,4 @@ function CourseReview({ review, idx, onDelete, isAdmin }) {
   );
 }
 
-export default CourseReview;
+export default CourseReviewCard;

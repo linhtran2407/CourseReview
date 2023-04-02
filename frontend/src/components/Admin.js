@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Box, TextField, Alert, Button } from "@mui/material";
+import {
+  Box,
+  TextField,
+  Alert,
+  Button,
+  Typography,
+  Chip,
+  Divider,
+} from "@mui/material";
 import Grid from "@mui/material/Grid";
 import axios from "axios";
 import CourseReviewCard from "./CourseReviewCard";
@@ -45,20 +53,32 @@ function Admin() {
   };
 
   const [courseReviews, setCourseReviews] = React.useState([]);
+  const [instructorReviews, setInstructorReviews] = React.useState([]);
 
   const fetchCourseReviews = async () => {
-    const res = await axios.get(`${backendPrefix}/admin/pendingReviews`);
+    const res = await axios.get(`${backendPrefix}/admin/pendingReviews/course`);
 
     if (res.status !== 200 || !res.data) {
       console.error("error fetching pending course reviews");
       return;
     }
-    const responseData = res.data;
-    setCourseReviews(responseData);
+    setCourseReviews(res.data);
+  };
+
+  const fetchInstructorReviews = async () => {
+    const res = await axios.get(`${backendPrefix}/admin/pendingReviews/instructor`);
+
+    if (res.status !== 200 || !res.data) {
+      console.error("error fetching pending course reviews");
+      return;
+    }
+
+    setInstructorReviews(res.data);
   };
 
   React.useEffect(() => {
     fetchCourseReviews();
+    fetchInstructorReviews();
   }, []);
 
   const handleDelete = (idx) => {
@@ -98,21 +118,59 @@ function Admin() {
         />
       </div>
     </Box>
-  ) : courseReviews.length > 0 ? (
-    <Grid container justify="center" alignItems="center" spacing={3}>
-      {courseReviews.map((review, idx) => (
-        <Grid item xs={12} sm={6} md={4} key={review._id}>
-          <CourseReviewCard
-            review={review}
-            idx={idx}
-            onDelete={() => handleDelete(idx)}
-            isAdmin={true}
+  ) : courseReviews.length > 0 || instructorReviews.length > 0 ? (
+    <Grid container justifyContent="center" alignItems="center" spacing={3}>
+      <Grid item>
+        <Divider>
+          <Chip
+            label="Pending Course Reviews"
+            variant="h5"
+            sx={{ fontSize: "30px" }}
           />
-        </Grid>
-      ))}
-       <Grid item xs={12}>
-            <HomeButton/>
+        </Divider>
+      </Grid>
+
+      <Grid container item spacing={3}>
+        {courseReviews.map((review, idx) => (
+          <Grid item xs={12} sm={6} md={4} key={review._id}>
+            <CourseReviewCard
+              review={review}
+              idx={idx}
+              reviewType="course"
+              onDelete={() => handleDelete(idx)}
+              isAdmin={true}
+            />
           </Grid>
+        ))}
+      </Grid>
+
+      <Grid item>
+        <Divider>
+          <Chip
+            label="Pending Instructor Reviews"
+            variant="h5"
+            sx={{ fontSize: "30px" }}
+          />
+        </Divider>
+      </Grid>
+
+      <Grid container item spacing={3}>
+        {instructorReviews.map((review, idx) => (
+          <Grid item xs={12} sm={6} md={4} key={review._id}>
+            <CourseReviewCard
+              review={review}
+              idx={idx}
+              reviewType="instructor"
+              onDelete={() => handleDelete(idx)}
+              isAdmin={true}
+            />
+          </Grid>
+        ))}
+      </Grid>
+
+      <Grid item xs={12}>
+        <HomeButton />
+      </Grid>
     </Grid>
   ) : (
     <Grid container spacing={3}>
@@ -125,7 +183,7 @@ function Admin() {
       <Grid item>
         <Grid container direction="row" alignItems="center">
           <Grid item xs={12}>
-          <HomeButton/>
+            <HomeButton />
           </Grid>
         </Grid>
       </Grid>

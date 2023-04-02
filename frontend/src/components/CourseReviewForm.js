@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "@mui/material/Button";
 import { TextField } from "@mui/material";
 import Slider from "@mui/material/Slider";
@@ -91,7 +91,7 @@ function CourseReviewForm() {
     setCoursesBySem(coursesWithFormat);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (formData.semester) {
       // reset course and instructor + reload list of courses
       // when semester changes
@@ -107,7 +107,7 @@ function CourseReviewForm() {
   }, [formData.semester]);
 
   // whenever list of courses changes, the formatted version of it changes too
-  React.useEffect(() => {
+  useEffect(() => {
     if (coursesBySem && coursesBySem.length > 0) {
       const set = new Set();
       for (const c of coursesBySem) {
@@ -119,9 +119,7 @@ function CourseReviewForm() {
   }, [coursesBySem]);
 
   // fetch all (BMC) instructors by selected semester and coures
-  const [instructorsBySemCourse, setInstructorsBySemCourse] = React.useState(
-    []
-  );
+  const [instructorsBySemCourse, setInstructorsBySemCourse] = React.useState([]);
   const [formattedInstructors, setFormattedInstructors] = React.useState([]);
 
   async function getInstructor(instructor) {
@@ -156,7 +154,7 @@ function CourseReviewForm() {
     setInstructorsBySemCourse(instructors);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (formData.semester && formData.course) {
       const matchingCourseObj = coursesBySem.find(
         (obj) => obj.format === formData.course
@@ -179,7 +177,7 @@ function CourseReviewForm() {
     }
   }, [formData.course]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (instructorsBySemCourse) {
       // format instructors
       const formattedInstructors = [];
@@ -190,7 +188,7 @@ function CourseReviewForm() {
     }
   }, [instructorsBySemCourse]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (formData.instructor) {
       const [name, email] = formData.instructor.split(" - ");
       setFormData({

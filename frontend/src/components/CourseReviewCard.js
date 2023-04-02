@@ -5,12 +5,12 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import { Delete, DoneAllRounded } from "@mui/icons-material";
+import { ThumbUp, ThumbDown } from "@mui/icons-material";
 import axios from "axios";
 import { shortToLongSemester, fullCourseName, showStatus, instructorNameEmail } from "./Formartter";
-import { courseMetrics } from "./ReviewMetrics";
+import { courseMetrics, instructorReviewFormFields, instructorMetrics } from "./ReviewMetrics";
 
-function CourseReviewCard({ review, idx, onDelete, isAdmin }) {
+function CourseReviewCard({ review, reviewType, idx, onDelete, isAdmin }) {
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
 
   const colors = [
@@ -37,24 +37,29 @@ function CourseReviewCard({ review, idx, onDelete, isAdmin }) {
     onDelete();
   };
 
-  const handleDelete = async (e) => {
+  const handleDisApprove = async (e) => {
     e.preventDefault();
 
-    const res = await axios.post(`${backendPrefix}/admin/delete/${review._id}`);
+    const res = await axios.post(`${backendPrefix}/admin/disapprove/${review._id}`);
 
     if (res.status !== 200 || !res.data) {
-      console.error("error deleting course review");
+      console.error("error disapproving course review");
       return;
     }
 
     onDelete();
   };
 
+  const formatCoursesTaken = (courses) => {
+    return courses.join(", ")
+  }
+
   return (
     <Card
       sx={{ maxWidth: 500, backgroundColor: `${colors[idx % colors.length]}` }}
     >
-      <CardContent>
+      {reviewType === "course" ? 
+      (<CardContent>
         <Typography gutterBottom variant="h5" component="div">
           {fullCourseName(review.courseTitle, review.courseNumber, "B")}
         </Typography>
@@ -77,17 +82,49 @@ function CourseReviewCard({ review, idx, onDelete, isAdmin }) {
         {isAdmin ? <Typography variant="body2" color="text.secondary">
           Status: {showStatus(review.status)}
         </Typography> : null}
-      </CardContent>
+      </CardContent>) : 
+      (<CardContent>
+        <Typography gutterBottom variant="h5" component="div">
+          {instructorNameEmail(review.name, review.email)}
+        </Typography>
+
+        <Typography gutterBottom variant="body2" color="text.secondary">
+          Courses taken: {formatCoursesTaken(review.coursesTaken)}
+        </Typography>
+
+        {instructorReviewFormFields.map((metric) => (
+          <Typography variant="body2" color="text.secondary">
+            {metric.name}: {review[metric.id]}
+          </Typography>
+        ))}
+
+        {Object.keys(instructorMetrics).map((key) => {
+          const metrics = instructorMetrics[key];
+          return metrics.map((metric) => {
+            return review[metric.id] ? (          
+              <Typography variant="body2" color="text.secondary">
+                {metric.name}
+              </Typography>
+            ) : null;
+          })
+        })}
+
+        {isAdmin ? <Typography variant="body2" color="text.secondary">
+          Status: {showStatus(review.status)}
+        </Typography> : null}
+      </CardContent>)
+      }
+
       {isAdmin ? (
         <CardActions>
           <Tooltip title="Approve">
             <IconButton onClick={handleApprove}>
-              <DoneAllRounded />
+              <ThumbUp />
             </IconButton>
           </Tooltip>
-          <Tooltip title="Delete">
-            <IconButton onClick={handleDelete}>
-              <Delete />
+          <Tooltip title="Disapprove">
+            <IconButton onClick={handleDisApprove}>
+              <ThumbDown />
             </IconButton>
           </Tooltip>
         </CardActions>

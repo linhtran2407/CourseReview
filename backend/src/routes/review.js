@@ -1,59 +1,52 @@
 const express = require("express");
 const router = express.Router();
-const { courseReviewModel } = require("../models/models");
+const {
+  courseReviewModel,
+  instructorReviewModel,
+} = require("../models/models");
+const {
+  fullCourseReviewFields,
+  instructorReviewMetrics,
+  fullInstructorReviewFields,
+} = require("./formFields");
 
 // add new course review
 router.post("/course", async (req, res) => {
   try {
     const courseReview = new courseReviewModel({
-      courseTitle: req.body.courseTitle,
-      courseNumber: req.body.courseNumber,
-      semester: req.body.semesterCode,
-      instructorName: req.body.instructorName,
-      instructorEmail: req.body.instructorEmail,
-      courseQuality: req.body.courseQuality,
-      instructorQuality: req.body.instructorQuality,
-      difficulty: req.body.difficulty,
-      workRequired: req.body.workRequired,
-      amountLearned: req.body.amountLearned,
-      stimulateInterest: req.body.stimulateInterest,
-      instructorAccess: req.body.instructorAccess,
-      comment: req.body.comment,
       status: 0, // pending
     });
 
-    const savedCourseReview = await courseReview.save();
-    res.status(201).json(savedCourseReview);
+    fullCourseReviewFields.forEach((field) => {
+      if (field === "semester") {
+        courseReview[field] = req.body.semesterCode;
+      } else {
+        courseReview[field] = req.body[field];
+      }
+    });
 
+    const savedReview = await courseReview.save();
+    res.status(201).json(savedReview);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 });
 
+// add new instructor review
 router.post("/instructor", async (req, res) => {
   try {
-    console.log(req.body);
-    // const courseReview = new courseReviewModel({
-    //   courseTitle: req.body.courseTitle,
-    //   courseNumber: req.body.courseNumber,
-    //   semester: req.body.semesterCode,
-    //   instructorName: req.body.instructorName,
-    //   instructorEmail: req.body.instructorEmail,
-    //   courseQuality: req.body.courseQuality,
-    //   instructorQuality: req.body.instructorQuality,
-    //   difficulty: req.body.difficulty,
-    //   workRequired: req.body.workRequired,
-    //   amountLearned: req.body.amountLearned,
-    //   stimulateInterest: req.body.stimulateInterest,
-    //   instructorAccess: req.body.instructorAccess,
-    //   comment: req.body.comment,
-    //   status: 0, // pending
-    // });
+    const instructorReview = new instructorReviewModel({
+      status: 0, // pending
+    });
 
-    // const savedCourseReview = await courseReview.save();
-    // res.status(201).json(savedCourseReview);
-
+    fullInstructorReviewFields.forEach((field) => {
+      instructorReview[field] = req.body[field];
+    });
+    
+    const savedReview = await instructorReview.save();
+    
+    res.status(201).json(savedReview);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

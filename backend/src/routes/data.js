@@ -6,18 +6,15 @@ const {
   courseReviewModel,
   instructorReviewModel,
 } = require("../models/models");
+const {
+  courseReviewMetrics,
+  instructorReviewMetrics,
+} = require("./formFields");
 
-const courseReviewMetrics = [
-  "courseQuality",
-  "instructorQuality",
-  "difficulty",
-  "workRequired",
-  "amountLearned",
-  "stimulateInterest",
-  "instructorAccess",
-];
-
-// get lists of unique courses and instructors for the searching bar
+/*
+ *  Course-review related APIs
+ */
+// get lists of unique courses and (BMC) instructors for the searching bar
 router.get("/courseAndInstructor", async (req, res) => {
   try {
     // get courses unique by title and number
@@ -66,25 +63,13 @@ router.get("/courseAndInstructor", async (req, res) => {
   }
 });
 
-// get lists of courses by semester
+// get lists of BMC courses by semester
 router.get("/bmc_courses/:semester", async (req, res) => {
   try {
     const courses = await BMCCourseModel.find({
       semester: req.params.semester,
     });
     res.status(200).json(courses);
-  } catch (err) {
-    console.error(err);
-    res.sendStatus(500);
-  }
-});
-
-// get all BMC instructors
-// assume instructors in DB are unique by email
-router.get("/bmc_instructors", async (req, res) => {
-  try {
-    const instructors = await BMCCInstructorModel.find({});
-    res.status(200).json(instructors);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
@@ -144,7 +129,8 @@ router.get("/review_course/:courseNumber", async (req, res) => {
         averages[key] = {};
         const obj = review.toObject();
         for (const field in obj) {
-          if (!courseReviewMetrics.includes(field) && field !== "comment") { // remove comment field for simplicity
+          if (!courseReviewMetrics.includes(field) && field !== "comment") {
+            // remove comment field for simplicity
             averages[key][field] = obj[field];
           }
         }
@@ -188,7 +174,20 @@ function computeAverages(reviews) {
   return res;
 }
 
-
+/*
+ *  Instructor-review related APIs
+ */
+// get all BMC instructors
+// assume instructors in DB are unique by email
+router.get("/bmc_instructors", async (req, res) => {
+  try {
+    const instructors = await BMCCInstructorModel.find({});
+    res.status(200).json(instructors);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
 
 router.get("/review_instructor/:instructorEmail", async (req, res) => {
   try {
@@ -198,6 +197,24 @@ router.get("/review_instructor/:instructorEmail", async (req, res) => {
     });
 
     res.status(200).json(reviews);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+});
+
+// get all BMC courses taught by the instructor specified by given last name
+router.get("/courses/:instructorLast", async (req, res) => {
+  try {
+    const courses = await BMCCourseModel.find({
+      instructor: req.params.instructorLast,
+    });
+    if (courses.length == 0) {
+      // retrieve all courses if cannot find matching ones
+      courses = await BMCCourseModel.find({});
+    }
+    courses.reverse();
+    res.status(200).json(courses);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);

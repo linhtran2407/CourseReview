@@ -6,7 +6,7 @@ const BMCCourseSchema = new mongoose.Schema({
   courseTitle: String,
   courseNumber: String,
   semester: String,
-  instructor: String,
+  instructor: String, // instructor's last name
   enrollment: Number,
 });
 
@@ -38,25 +38,29 @@ const instructorReviewSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
   department: { type: String, required: true },
-  // courses: [courseReviewSchema], // todo
+  coursesTaken: { type: [String] },
+
   overallRating: { type: Number, required: true },
   clearCommunication: { type: Boolean},
   responsive: { type: Boolean},
-  inspiring: { type: Boolean},
   engaging: { type: Boolean},
-  caring: { type: Boolean},
+  inspiring: { type: Boolean},
   createWelcomingEnv: { type: Boolean},
+  accessibleOutsideClass: { type: Boolean},
+
   lectureHeavy: { type: Boolean},
   testHeavy: { type: Boolean},
   readingHeavy: { type: Boolean},
-  giveGoodFeedback: { type: Boolean},
-  organized: { type: Boolean},
-  accessibleOutsideClass: { type: Boolean},
+  lotsOfHomework: { type: Boolean },
   assignsUsefulProjects: { type: Boolean},
+  organized: { type: Boolean},
+
+  giveGoodFeedback: { type: Boolean},
   offersExtraCredit: { type: Boolean},
   fairGrader: { type: Boolean},
   toughGrader: { type: Boolean},
-  classesTaken: { type: [String] },
+  clearGradingCriteria: { type: Boolean },
+  
   comment: { type: String },
   status: { type: Number }, // 0: pending, 1: approved, 2: rejected
 });

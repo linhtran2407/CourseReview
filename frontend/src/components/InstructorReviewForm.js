@@ -15,31 +15,38 @@ import {
   InputLabel,
   Typography,
 } from "@mui/material";
-import InterpreterModeIcon from '@mui/icons-material/InterpreterMode';
-import ClassIcon from '@mui/icons-material/Class';
-import FeedbackIcon from '@mui/icons-material/Feedback';
+import { useTheme } from "@mui/material/styles";
+import InterpreterModeIcon from "@mui/icons-material/InterpreterMode";
+import ClassIcon from "@mui/icons-material/Class";
+import FeedbackIcon from "@mui/icons-material/Feedback";
 import Select from "@mui/material/Select";
 import { useState } from "react";
 import axios from "axios";
 import AlertDialog from "./AlertDialog";
 import { Check, Send } from "@mui/icons-material";
-import { getRatingDescription } from "./Formartter";
+import {
+  getRatingDescription,
+  fullCourseName,
+  shortToLongSemester,
+} from "./Formartter";
 import { instructorMetrics } from "./ReviewMetrics";
 
 function InstructorReviewForm() {
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
   const navigate = useNavigate();
+  const theme = useTheme();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     department: "CMSC",
-    overAllRating: 3,
+    overallRating: 3,
     clearCommunication: false,
     responsive: false,
     inspiring: false,
     engaging: false,
-    enthusiastic: false,
-    caring: false,
+    lotsOfHomework: false,
+    toughGrader: false,
+    clearGradingCriteria: false,
     createWelcomingEnv: false,
     lectureHeavy: false,
     testHeavy: false,
@@ -50,17 +57,11 @@ function InstructorReviewForm() {
     assignsUsefulProjects: false,
     offersExtraCredit: false,
     fairGrader: false,
-    classesTaken: { type: [String] },
+    coursesTaken: [],
     comment: "",
   });
 
-  const [chipId, setChipId] = React.useState([]);
-
-  useEffect(() => {}, [chipId]);
-
   const handleChangeChip = (e) => {
-    console.log(e.target.name);
-    console.log(e.target.checked);
     setFormData({ ...formData, [e.target.name]: e.target.checked });
   };
 
@@ -75,11 +76,15 @@ function InstructorReviewForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await axios.post(`${backendPrefix}/review/instructor`, formData, {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    });
+    const res = await axios.post(
+      `${backendPrefix}/review/instructor`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
 
     if ((res.status !== 200 && res.status !== 201) || !res.data) {
       console.error("error saving course review: " + res.status);
@@ -99,13 +104,26 @@ function InstructorReviewForm() {
     setInstructors(res.data);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchInstructors();
   }, []);
 
   const [emailByInstructor, setEmailByInstructor] = React.useState([]);
-  React.useEffect(() => {
+  const [instructorLast, setInstructorLast] = React.useState(null);
+  const [courses, setCourses] = React.useState([]);
+  
+  useEffect(() => {
+    // reset email + last name to empty
+    setFormData({
+      ...formData,
+      email: "",
+      coursesTaken: []
+    });
+    setInstructorLast(null);
+    setCourses([]);
+
     if (formData.name) {
+      // fetch email(s)
       const emails = [];
       instructors.forEach((instructor) => {
         if (instructor.name === formData.name) {
@@ -114,22 +132,91 @@ function InstructorReviewForm() {
       });
 
       setEmailByInstructor(emails);
+
+      // extract last name to search for courses
+      const names = formData.name.split(" ");
+      const lastName =
+        names.length > 1 ? names[names.length - 1] : formData.name;
+      setInstructorLast(lastName);
     }
   }, [formData.name]);
 
+  const fetchCoursesByInstructorLast = async () => {
+    const res = await axios.get(
+      `${backendPrefix}/data/courses/${instructorLast}`
+    );
+
+    if (res.status !== 200 || !res.data) {
+      console.error("error fetching courses by instructor last");
+      return;
+    }
+
+    const fullCourseNames = [];
+    res.data.forEach((course) => {
+      const fullName = fullCourseName(
+        course.title,
+        course.number,
+        "bmc"
+      );
+      const longSem = shortToLongSemester(course.semester);
+      const nameWithSem = `${fullName} (${longSem})`;
+      if (!fullCourseNames.includes(nameWithSem)) {
+        fullCourseNames.push(nameWithSem);
+      }
+    });
+
+    setCourses(fullCourseNames);
+  };
+
+  useEffect(() => {
+    if (instructorLast) fetchCoursesByInstructorLast();
+  }, [instructorLast]);
+
   function hasRequiredFields() {
-    return formData.department && formData.email && formData.name;
+    return formData.department && formData.email && formData.name && formData.coursesTaken.length > 0;
   }
 
   const getIcon = (key) => {
-    if (key === "Communication and Engagement"){
+    if (key === "Communication and Engagement") {
       return InterpreterModeIcon;
-    } else if (key === "Course Design and Assessment"){
+    } else if (key === "Course Design and Assessment") {
       return ClassIcon;
     } else {
       return FeedbackIcon;
     }
+  };
+
+  const ITEM_HEIGHT = 48;
+  const ITEM_PADDING_TOP = 8;
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+      },
+    },
+  };
+
+  function getStyles(course) {
+    return {
+      fontWeight:
+        formData.coursesTaken.includes(course)
+          ? "bold"
+          : "regular",
+    };
   }
+
+  const handleCoursesChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setFormData(
+      {...formData,
+      coursesTaken : typeof value === 'string' ? value.split(',') : value,}
+      
+    );
+    console.log(formData.coursesTaken);
+  };
 
   const [submissionAlert, setSubmissionAlert] = React.useState(false);
 
@@ -173,7 +260,7 @@ function InstructorReviewForm() {
             labelId="email-label"
             id="email"
             value={formData.email}
-            label="Email"
+            label="Instructor Email"
             onChange={handleChange}
             name="email"
             required
@@ -195,13 +282,48 @@ function InstructorReviewForm() {
           />
         </FormControl>
 
+        <FormControl fullWidth sx={{ marginBottom: "16px" }}>
+          <InputLabel id="courses">
+            Courses taken with this instructor
+          </InputLabel>
+          <Select
+            label="Courses taken with this instructor"
+            required
+            labelId="courses-label"
+            disabled={!formData.name}
+            id="courses"
+            multiple
+            name="coursesTaken"
+            value={formData.coursesTaken}
+            onChange={handleCoursesChange}
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((value) => (
+                <Chip key={value} label={value} />
+              ))}
+              </Box>
+            )}
+            MenuProps={MenuProps}
+          >
+            {courses.map((course) => (
+              <MenuItem
+                key={course}
+                value={course}
+                style={getStyles(course)}
+              >
+                {course}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
         {hasRequiredFields() ? (
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={2}>
               <Grid container item spacing={2}>
                 <Grid
                   item
-                  xs={1}
+                  xs={2}
                   sx={{ marginBottom: "16px", marginLeft: "5px" }}
                 >
                   <Typography>Overall Rating</Typography>
@@ -238,27 +360,40 @@ function InstructorReviewForm() {
                   marginRight: "20px",
                 }}
               >
-
                 {Object.keys(instructorMetrics).map((key) => {
                   const metrics = instructorMetrics[key];
                   const iconComponent = getIcon(key);
                   return (
                     <Grid item xs={4}>
-                      <Chip icon={React.createElement(iconComponent)} label={key} sx={{fontSize: "16px", marginBottom: "16px"}} />
+                      <Chip
+                        icon={React.createElement(iconComponent)}
+                        label={key}
+                        sx={{ fontSize: "16px", marginBottom: "16px" }}
+                      />
                       {metrics.map((metric) => {
                         return (
-                          <Grid item xs={3}>
-                            <Paper elevation={3} sx={{ width: 350 }}>
-                              <Grid container alignItems={"center"}>
-                                <Grid item>
-                                  <Checkbox onChange={handleChangeChip} value={metric.id} name={metric.id} />
-                                </Grid>
-                                <Grid item xs={8}>
-                                  <Typography>{metric.name}</Typography>
-                                </Grid>
+                          <Paper
+                            elevation={3}
+                            sx={{
+                              width: "100%",
+                              [theme.breakpoints.up("sm")]: {
+                                width: 350,
+                              },
+                            }}
+                          >
+                            <Grid container alignItems={"center"}>
+                              <Grid item>
+                                <Checkbox
+                                  onChange={handleChangeChip}
+                                  value={metric.id}
+                                  name={metric.id}
+                                />
                               </Grid>
-                            </Paper>
-                          </Grid>
+                              <Grid item xs={8}>
+                                <Typography>{metric.name}</Typography>
+                              </Grid>
+                            </Grid>
+                          </Paper>
                         );
                       })}
                     </Grid>

@@ -1,58 +1,55 @@
 import React from "react";
 import axios from "axios";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Box from "@mui/material/Box";
 import {
   fullCourseName,
   instructorNameEmail,
-  shortToLongSemester,
 } from "./Formartter";
-import { TableBody } from "@mui/material";
-import HomeButton from "./HomeButton";
-import Grid from "@mui/material/Grid";
+import { HomeButton } from "./NavButton";
 import SearchBar from "./SearchBar";
-import { courseMetrics } from "./ReviewMetrics";
 import "../css/Review.css";
+import CourseReview from "./CourseReview";
+import InstructorReview from "./InstructorReview";
 
+/*
+ * REVIEWS FOR A SPECIFIC COURSE/INSTRUCTOR
+ */
 function Review() {
   const location = useLocation();
+  const { reviewType, reviewKey } = useParams();
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
-  const [reviews, setReviews] = React.useState([]);
-  const [selectedOption, setSelectedOption] = React.useState(location.state);
-  const [clickedRow, setClickedRow] = React.useState(null);
+  const [name, setName] = React.useState();
+  const [courseReviews, setCourseReviews] = React.useState([]);
+  const [instructorReviews, setInstructorReviews] = React.useState([]);
 
-  const fetchReviews = async (state) => {
+  const fetchReviews = async () => {
     const res =
-      state.type === "course"
-        ? await axios.get(`${backendPrefix}/data/review_course/${state.number}`)
-        : await axios.get(
-            `${backendPrefix}/data/review_instructor/${state.email}`
-          );
-
-    if (res.status !== 200 || !res.data) {
+    reviewType === "course"
+    ? await axios.get(`${backendPrefix}/data/review_course/${reviewKey}`)
+    : await axios.get(
+      `${backendPrefix}/data/review_instructor/${reviewKey}`
+      );
+      
+      if (res.status !== 200 || !res.data) {
       console.error("error fetching reviews");
       return;
     }
 
-    setReviews(res.data);
+    reviewType === "course"
+      ? setCourseReviews(res.data)
+      : setInstructorReviews(res.data);
   };
 
-  React.useEffect(() => {
-    fetchReviews(location.state);
-  }, []);
+  const fetchName = async () => {
+    const res = await axios.get(`${backendPrefix}/data/name/${reviewType}/${reviewKey}`);
+    setName(res.data);
+  }
 
   React.useEffect(() => {
-    setClickedRow(null);
-    setSelectedOption(location.state);
-    fetchReviews(location.state);
-  }, [location.state]);
+    fetchReviews();
+    fetchName();
+  }, [location, []]);
 
   return (
     <>
@@ -60,177 +57,25 @@ function Review() {
         <SearchBar />
       </div>
 
-      {selectedOption.type === "course" ? (
-        <Typography className="title" gutterBottom variant="h5">
-          {" "}
-          {fullCourseName(selectedOption.name, selectedOption.number, "B")}{" "}
-        </Typography>
-      ) : (
-        <Typography className="title" gutterBottom variant="h5">
-          {" "}
-          {instructorNameEmail(selectedOption.name, selectedOption.email)}{" "}
-        </Typography>
-      )}
-
-      {!reviews ||
-      !reviews["grouped"] ||
-      Object.keys(reviews["grouped"]).length === 0 ? (
-        <Grid container justify="center" alignItems="center" spacing={3}>
-          <Grid item xs={12}>
-            <Typography gutterBottom variant="body1">
-              There is no review currently. Feel free to contribute one :-{`)`}
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <HomeButton />
-          </Grid>
-        </Grid>
+      {reviewType === "course" ? (
+        <div>
+          <Typography className="title" gutterBottom variant="h5">
+            {fullCourseName(name, reviewKey, "B")}{" "}
+          </Typography>
+          <CourseReview reviews={courseReviews} />
+        </div>
       ) : (
         <div>
-          <div>
-            <Box className="box">
-              <Paper
-                className="reviewTables"
-                sx={{ width: "100%", overflow: "hidden" }}
-              >
-                <TableContainer>
-                  <Table stickyHeader sx={{ border: "2px solid whitesmoke" }}>
-                    <TableHead sx={{ fontWeight: "bold", fontSize: "17px" }}>
-                      Metric Averages
-                    </TableHead>
-                    <TableRow>
-                      <TableCell align="center" className="reviewTableHeader">
-                        Semester
-                      </TableCell>
-                      <TableCell
-                        key="instructor"
-                        align="center"
-                        className="reviewTableHeader"
-                        style={{ width: "20%" }}
-                      >
-                        Instructor
-                      </TableCell>
-                      {courseMetrics.map((column) => (
-                        <TableCell
-                          key={column.id}
-                          align="center"
-                          className="reviewTableHeader"
-                        >
-                          {column.name}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-
-                    <TableBody>
-                      {Object.keys(reviews["averages"]).map((key) => {
-                        const data = reviews["averages"][key];
-                        console.log(data);
-
-                        return (
-                          <TableRow
-                            onClick={() => {
-                              setClickedRow(key);
-                              console.log("fdhjksa");
-                              // color to blue
-                            }}
-                            hover
-                            selected={clickedRow === key}
-                            sx={{ "& > *": { borderBottom: "unset" } }}
-                          >
-                            <TableCell>
-                              {shortToLongSemester(data.semester)}
-                            </TableCell>
-                            <TableCell component="th" scope="row">
-                              {instructorNameEmail(
-                                data.instructorName,
-                                data.instructorEmail
-                              )}
-                            </TableCell>
-
-                            {courseMetrics.map((metric) => (
-                              <TableCell align="center">
-                                {" "}
-                                {data[metric.id]}{" "}
-                              </TableCell>
-                            ))}
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
-
-              {clickedRow ? (
-                <Paper className="detailTable">
-                  <TableContainer>
-                    <Table stickyHeader sx={{ border: "2px solid whitesmoke" }}>
-                      <TableHead sx={{ fontWeight: "bold", fontSize: "17px" }}>
-                        Individual Reviews
-                      </TableHead>
-
-                      <TableRow>
-                        <TableCell
-                          align="center"
-                          className="reviewTableHeader"
-                          style={{ width: "1px" }}
-                        >
-                          No.
-                        </TableCell>
-                        {courseMetrics.map((column) => (
-                          <TableCell
-                            key={column.id}
-                            align="center"
-                            className="reviewTableHeader"
-                          >
-                            {column.name}
-                          </TableCell>
-                        ))}
-                        <TableCell
-                          align="center"
-                          style={{ width: "30%" }}
-                          className="reviewTableHeader"
-                        >
-                          Additional Comment
-                        </TableCell>
-                      </TableRow>
-
-                      <TableBody>
-                        {reviews["grouped"][clickedRow] &&
-                          reviews["grouped"][clickedRow].map((review, idx) => {
-                            return (
-                              <TableRow
-                                hover
-                                sx={{ "& > *": { borderBottom: "unset" } }}
-                              >
-                                <TableCell align="center">{idx + 1}.</TableCell>
-
-                                {courseMetrics.map((metric) => (
-                                  <TableCell align="center">
-                                    {" "}
-                                    {review[metric.id]}{" "}
-                                  </TableCell>
-                                ))}
-                                <TableCell>
-                                  <div className="comment">
-                                    {review["comment"]}
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Paper>
-              ) : null}
-            </Box>
-          </div>
-          <div className="home-button">
-            <HomeButton />
-          </div>
-        </div>
+        <Typography className="title" gutterBottom variant="h5">
+          {instructorNameEmail(name, reviewKey)}{" "}
+        </Typography>
+        <InstructorReview reviews={instructorReviews} />
+        </div>  
       )}
+      
+      <div className="home-button">
+        <HomeButton />
+      </div>
     </>
   );
 }

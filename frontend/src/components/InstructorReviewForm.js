@@ -31,6 +31,10 @@ import {
 } from "./Formartter";
 import { instructorMetrics } from "./ReviewMetrics";
 
+/*
+ * FORM TO ADD INSTRUCTOR REVIEW 
+ *
+ */
 function InstructorReviewForm() {
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
   const navigate = useNavigate();

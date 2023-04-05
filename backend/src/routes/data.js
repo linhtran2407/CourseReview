@@ -174,6 +174,29 @@ function computeAverages(reviews) {
   return res;
 }
 
+// return course name if type is course and key is a course number
+// return instructor name if type is instructor and key is an email
+router.get("/name/:type/:key", async (req, res) => {
+  const type = req.params.type;
+  
+  try {
+    const arr = type === "course"? await BMCCourseModel.find({
+      number: req.params.key
+    }) : await BMCCInstructorModel.find({
+      email: req.params.key
+    })
+
+      const name = type === "course" ? arr[0].title : arr[0].name;
+      res.status(200).send(name);
+    
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(500);
+  }
+  
+  
+});
+
 /*
  *  Instructor-review related APIs
  */
@@ -192,16 +215,26 @@ router.get("/bmc_instructors", async (req, res) => {
 router.get("/review_instructor/:instructorEmail", async (req, res) => {
   try {
     const reviews = await instructorReviewModel.find({
-      instructorEmail: req.params.instructorEmail,
+      email: req.params.instructorEmail,
       status: 1, // approved
     });
 
-    res.status(200).json(reviews);
+    const reviewMap = processReviews(reviews);
+
+    res.status(200).json(reviewMap);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
   }
 });
+
+function processReviews(reviews) {
+  const avgOverallRating = reviews.reduce((acc, curr) => acc + curr.overallRating, 0) / reviews.length;
+  const reviewMap = {};
+  reviewMap["reviews"] = reviews;
+  reviewMap["avgOverallRating"] = avgOverallRating;
+  return reviewMap;
+}
 
 // get all BMC courses taught by the instructor specified by given last name
 router.get("/courses/:instructorLast", async (req, res) => {

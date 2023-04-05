@@ -21,16 +21,16 @@ const router = createBrowserRouter([
     element: <CourseReviewForm />,
   },
   {
+    path: "review-instructor",
+    element: <InstructorReviewForm />,
+  },
+  {
     path: "admin",
     element: <Admin />,
   },
   {
-    path: "search-review",
+    path: "search-review/:reviewType/:reviewKey",
     element: <Review />,
-  },
-  {
-    path: "review-instructor",
-    element: <InstructorReviewForm />,
   },
 ]);
 

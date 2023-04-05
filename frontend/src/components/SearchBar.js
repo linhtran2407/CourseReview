@@ -31,7 +31,11 @@ function SearchBar() {
 
   function handleKeyPress(e) {
     if (e.key === 'Enter') {
-      navigate("/search-review", { state: selectedOption })
+      if (selectedOption.type === "course") {
+        navigate(`/search-review/${selectedOption.type}/${selectedOption.number}`)
+      } else {
+        navigate(`/search-review/${selectedOption.type}/${selectedOption.email}`)
+      }
     }
 }
 

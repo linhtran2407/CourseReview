@@ -20,6 +20,10 @@ import { Check, Send } from "@mui/icons-material";
 import { longToShortSemester, getRatingDescription } from "./Formartter";
 import { courseMetrics } from "./ReviewMetrics";
 
+/*
+ * FORM TO ADD COURSE REVIEW 
+ *
+ */
 function CourseReviewForm() {
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
 

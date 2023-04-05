@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 // title,number,semester,instructor,enrollment
 // schema defined based on BMC_CS_courses.csv file format
 const BMCCourseSchema = new mongoose.Schema({
-  courseTitle: String,
-  courseNumber: String,
+  title: String,
+  number: Number,
   semester: String,
   instructor: String, // instructor's last name
   enrollment: Number,

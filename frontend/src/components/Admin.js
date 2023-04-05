@@ -10,10 +10,10 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import axios from "axios";
-import CourseReviewCard from "./CourseReviewCard";
+import PendingReviewCard from "./PendingReviewCard";
 import { TagFaces } from "@mui/icons-material";
 
-import HomeButton from "./HomeButton";
+import {HomeButton} from "./NavButton";
 
 function Admin() {
   const backendPrefix = process.env.REACT_APP_BACKEND_PREFIX;
@@ -66,7 +66,9 @@ function Admin() {
   };
 
   const fetchInstructorReviews = async () => {
-    const res = await axios.get(`${backendPrefix}/admin/pendingReviews/instructor`);
+    const res = await axios.get(
+      `${backendPrefix}/admin/pendingReviews/instructor`
+    );
 
     if (res.status !== 200 || !res.data) {
       console.error("error fetching pending course reviews");
@@ -81,9 +83,13 @@ function Admin() {
     fetchInstructorReviews();
   }, []);
 
-  const handleDelete = (idx) => {
+  const handleDelete = (idx, reviewType) => {
     // Delete the element at the given index
-    setCourseReviews((prevReviews) => {
+    (reviewType === "course") ? setCourseReviews((prevReviews) => {
+      const newReviews = [...prevReviews];
+      newReviews.splice(idx, 1);
+      return newReviews;
+    }) : setInstructorReviews((prevReviews) => {
       const newReviews = [...prevReviews];
       newReviews.splice(idx, 1);
       return newReviews;
@@ -133,11 +139,11 @@ function Admin() {
       <Grid container item spacing={3}>
         {courseReviews.map((review, idx) => (
           <Grid item xs={12} sm={6} md={4} key={review._id}>
-            <CourseReviewCard
+            <PendingReviewCard
               review={review}
               idx={idx}
               reviewType="course"
-              onDelete={() => handleDelete(idx)}
+              onDelete={() => handleDelete(idx, "course")}
               isAdmin={true}
             />
           </Grid>
@@ -157,11 +163,11 @@ function Admin() {
       <Grid container item spacing={3}>
         {instructorReviews.map((review, idx) => (
           <Grid item xs={12} sm={6} md={4} key={review._id}>
-            <CourseReviewCard
+            <PendingReviewCard
               review={review}
               idx={idx}
               reviewType="instructor"
-              onDelete={() => handleDelete(idx)}
+              onDelete={() => handleDelete(idx, "instructor")}
               isAdmin={true}
             />
           </Grid>

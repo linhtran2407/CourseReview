@@ -103,6 +103,7 @@ router.get("/review_course/:courseNumber", async (req, res) => {
       status: 1, // approved
     });
 
+
     // sort reviews by semester in reverse chronological order
     reviews.sort((a, b) => {
       const semA = a.semester;
@@ -140,12 +141,13 @@ router.get("/review_course/:courseNumber", async (req, res) => {
       return res;
     }, {});
 
-    Object.keys(grouped).reduce((res, key) => {
+
+    Object.keys(grouped).forEach((key) => {
       const avg = computeAverages(grouped[key]);
       for (const field of courseReviewMetrics) {
         averages[key][field] = avg[field];
       }
-    }, {});
+    })
 
     const arr = {
       grouped: grouped,
@@ -178,23 +180,23 @@ function computeAverages(reviews) {
 // return instructor name if type is instructor and key is an email
 router.get("/name/:type/:key", async (req, res) => {
   const type = req.params.type;
-  
-  try {
-    const arr = type === "course"? await BMCCourseModel.find({
-      number: req.params.key
-    }) : await BMCCInstructorModel.find({
-      email: req.params.key
-    })
 
-      const name = type === "course" ? arr[0].title : arr[0].name;
-      res.status(200).send(name);
-    
+  try {
+    const arr =
+      type === "course"
+        ? await BMCCourseModel.find({
+            number: req.params.key,
+          })
+        : await BMCCInstructorModel.find({
+            email: req.params.key,
+          });
+
+    const name = type === "course" ? arr[0].title : arr[0].name;
+    res.status(200).send(name);
   } catch (err) {
     console.error(err);
     res.sendStatus(500);
   }
-  
-  
 });
 
 /*
@@ -229,7 +231,8 @@ router.get("/review_instructor/:instructorEmail", async (req, res) => {
 });
 
 function processReviews(reviews) {
-  const avgOverallRating = reviews.reduce((acc, curr) => acc + curr.overallRating, 0) / reviews.length;
+  const avgOverallRating =
+    reviews.reduce((acc, curr) => acc + curr.overallRating, 0) / reviews.length;
   const reviewMap = {};
   reviewMap["reviews"] = reviews;
   reviewMap["avgOverallRating"] = avgOverallRating;

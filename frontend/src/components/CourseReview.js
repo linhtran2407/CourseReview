@@ -7,7 +7,6 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Box from "@mui/material/Box";
 import {
-  fullCourseName,
   instructorNameEmail,
   shortToLongSemester,
 } from "./Formartter";
@@ -81,7 +80,7 @@ export default function CourseReview({reviews}) {
                     </TableCell>
 
                     {courseMetrics.map((metric) => (
-                      <TableCell align="center"> {data[metric.id]} </TableCell>
+                      <TableCell align="center" > {data[metric.id]} </TableCell>
                     ))}
                   </TableRow>
                 );
@@ -136,7 +135,7 @@ export default function CourseReview({reviews}) {
                         <TableCell align="center">{idx + 1}.</TableCell>
 
                         {courseMetrics.map((metric) => (
-                          <TableCell align="center">
+                          <TableCell align="center" style={{ fontSize: 16 }}>
                             {" "}
                             {review[metric.id]}{" "}
                           </TableCell>

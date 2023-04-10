@@ -213,8 +213,9 @@ function CourseReviewForm() {
     setSubmissionAlert(true);
   };
 
-  const closeSubmissionAlert = () => {
+  const closeSubmissionAlert = (courseNumber) => {
     setSubmissionAlert(false);
+    navigate(`/search-review/course/${courseNumber}`);
   };
 
   return (
@@ -369,7 +370,7 @@ function CourseReviewForm() {
 
         <AlertDialog
           open={submissionAlert}
-          handleClose={closeSubmissionAlert}
+          handleClose={() => closeSubmissionAlert(formData.courseNumber)}
         />
         <Stack spacing={2} direction="row">
           <Button

@@ -11,7 +11,7 @@ import {
   Paper,
   FormControl,
   MenuItem,
-  Chip,
+  Chip, 
   InputLabel,
   Typography,
 } from "@mui/material";
@@ -228,8 +228,9 @@ function InstructorReviewForm() {
     setSubmissionAlert(true);
   };
 
-  const closeSubmissionAlert = () => {
+  const closeSubmissionAlert = (email) => {
     setSubmissionAlert(false);
+    navigate(`/search-review/instructor/${email}`);
   };
 
   return (
@@ -338,12 +339,12 @@ function InstructorReviewForm() {
                     onChange={handleChange}
                     aria-label="Overall Rating"
                     defaultValue={3}
-                    name="overAllRating"
-                    value={formData["overAllRating"]}
+                    name="overallRating"
+                    value={formData["overallRating"]}
                     valueLabelDisplay="auto"
                     valueLabelFormat={getRatingDescription(
-                      formData["overAllRating"],
-                      "overAllRating"
+                      formData["overallRating"],
+                      "overallRating"
                     )}
                     step={1}
                     marks
@@ -428,7 +429,7 @@ function InstructorReviewForm() {
 
         <AlertDialog
           open={submissionAlert}
-          handleClose={closeSubmissionAlert}
+          handleClose={() => closeSubmissionAlert(formData.email)}
         />
         <Stack spacing={2} direction="row">
           <Button

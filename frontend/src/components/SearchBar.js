@@ -31,7 +31,9 @@ function SearchBar() {
 
   function handleKeyPress(e) {
     if (e.key === 'Enter') {
-      if (selectedOption.type === "course") {
+      if (!selectedOption || !selectedOption.type) {
+        navigate(`/error`)
+      } else if (selectedOption.type === "course") {
         navigate(`/search-review/${selectedOption.type}/${selectedOption.number}`)
       } else {
         navigate(`/search-review/${selectedOption.type}/${selectedOption.email}`)

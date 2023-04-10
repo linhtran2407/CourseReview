@@ -20,7 +20,7 @@ export default function AlertDialog({ open, handleClose }) {
             </Button>
           }
         >
-          Thank you! You have successfully submitted your review!
+          Thank you! Your review has been successfully submitted! Once the admin approves your review, you will be able to see it on our platform.
         </Alert>
       </Dialog>
     </div>

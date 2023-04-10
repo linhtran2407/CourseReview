@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./css/index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import ErrorPage from "./error-page";
+import ErrorPage from "./components/ErrorPage";
 import Home from "./components/Home";
 import CourseReviewForm from "./components/CourseReviewForm";
 import InstructorReviewForm from "./components/InstructorReviewForm";
@@ -32,6 +32,10 @@ const router = createBrowserRouter([
     path: "search-review/:reviewType/:reviewKey",
     element: <Review />,
   },
+  {
+    path: "error",
+    element: <ErrorPage />
+  }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

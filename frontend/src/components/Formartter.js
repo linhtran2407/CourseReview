@@ -1,3 +1,22 @@
+import { instructorMetrics } from "./ReviewMetrics";
+import ForumRoundedIcon from '@mui/icons-material/ForumRounded';
+import FlashOnRoundedIcon from '@mui/icons-material/FlashOnRounded';
+import Diversity3RoundedIcon from '@mui/icons-material/Diversity3Rounded';
+import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
+import Diversity2RoundedIcon from '@mui/icons-material/Diversity2Rounded';
+import MeetingRoomRoundedIcon from '@mui/icons-material/MeetingRoomRounded';
+import MenuBookRoundedIcon from '@mui/icons-material/MenuBookRounded';
+import ModeRoundedIcon from '@mui/icons-material/ModeRounded';
+import PersonSearchRoundedIcon from '@mui/icons-material/PersonSearchRounded';
+import FormatListNumberedRtlRoundedIcon from '@mui/icons-material/FormatListNumberedRtlRounded';
+import ExtensionRoundedIcon from '@mui/icons-material/ExtensionRounded';
+import FolderZipRoundedIcon from '@mui/icons-material/FolderZipRounded';
+import EmojiEventsRoundedIcon from '@mui/icons-material/EmojiEventsRounded';
+import CardGiftcardRoundedIcon from '@mui/icons-material/CardGiftcardRounded';
+import BalanceRoundedIcon from '@mui/icons-material/BalanceRounded';
+import LocalFireDepartmentRoundedIcon from '@mui/icons-material/LocalFireDepartmentRounded';
+import StraightenRoundedIcon from '@mui/icons-material/StraightenRounded';
+
 // convert semester to correct format in frontend
 // eg: Fall 2021 <- f21, Spring 2023 <- s23
 export function shortToLongSemester(semester) {
@@ -37,7 +56,7 @@ export function showStatus(status) {
 }
 
 export function getRatingDescription(rate, field) {
-  if (field === "courseQuality" || field === "instructorQuality" || field === "instructorAccess" || field === "overAllRating") {
+  if (field === "courseQuality" || field === "instructorQuality" || field === "instructorAccess" || field === "overallRating") {
     switch (rate) {
       case 1:
         return "Very Poor";
@@ -99,3 +118,48 @@ export function getRatingDescription(rate, field) {
     }
   }
 }
+
+const getInstructorMetricGroupNameById = (id) => {
+  for (const groupName in instructorMetrics) {
+    const metrics = instructorMetrics[groupName];
+    if (metrics.find(metric => metric.id === id)) {
+      return groupName;
+    }
+  }
+  return null;
+};
+
+
+export const getInstructorMetricColor = (id) => {
+  const groupName = getInstructorMetricGroupNameById(id);
+  if (groupName === "Communication and Engagement") {
+    return "rgb(151 227 194)"; // green
+  } else if (groupName === "Course Design and Assessment") {
+    return "rgb(247 176 173)"; // red
+  } else if (groupName === "Grading and Feedback") {
+    return "rgb(244 244 148)"; // yellow
+  }
+};
+
+export const instructorMetricIcon = {
+  "clearCommunication": ForumRoundedIcon,
+  "responsive": FlashOnRoundedIcon,
+  "engaging": Diversity3RoundedIcon,
+  "inspiring": AutoAwesomeRoundedIcon,
+  "createWelcomingEnv": Diversity2RoundedIcon,
+  "accessibleOutsideClass": MeetingRoomRoundedIcon,
+  "lectureHeavy": MenuBookRoundedIcon,
+  "testHeavy": ModeRoundedIcon,
+  "readingHeavy": PersonSearchRoundedIcon,
+  "lotsOfHomework": FormatListNumberedRtlRoundedIcon,
+  "assignsUsefulProjects": ExtensionRoundedIcon,
+  "organized": FolderZipRoundedIcon,
+  "giveGoodFeedback": EmojiEventsRoundedIcon,
+  "offersExtraCredit": CardGiftcardRoundedIcon,
+  "fairGrader": BalanceRoundedIcon,
+  "toughGrader": LocalFireDepartmentRoundedIcon,
+  "clearGradingCriteria": StraightenRoundedIcon,
+};
+
+
+

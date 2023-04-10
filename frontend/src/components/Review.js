@@ -11,6 +11,8 @@ import SearchBar from "./SearchBar";
 import "../css/Review.css";
 import CourseReview from "./CourseReview";
 import InstructorReview from "./InstructorReview";
+import ErrorPage from "./ErrorPage";
+
 
 /*
  * REVIEWS FOR A SPECIFIC COURSE/INSTRUCTOR
@@ -64,14 +66,14 @@ function Review() {
           </Typography>
           <CourseReview reviews={courseReviews} />
         </div>
-      ) : (
+      ) : reviewType === "instructor" ?(
         <div>
         <Typography className="title" gutterBottom variant="h5">
           {instructorNameEmail(name, reviewKey)}{" "}
         </Typography>
         <InstructorReview reviews={instructorReviews} />
         </div>  
-      )}
+      ) : <ErrorPage />}
       
       <div className="home-button">
         <HomeButton />

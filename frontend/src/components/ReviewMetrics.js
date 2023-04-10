@@ -33,10 +33,10 @@ export const instructorMetrics = {
 
   ],
 };
+
 export const instructorReviewFormFields = [
   { id: "department", name: "Department"},
   { id: "overallRating", name: "Overall Rating"},
   { id: "comment", name: "Comment"},
   
 ]
-

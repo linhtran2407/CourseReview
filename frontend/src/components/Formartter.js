@@ -16,6 +16,25 @@ import CardGiftcardRoundedIcon from '@mui/icons-material/CardGiftcardRounded';
 import BalanceRoundedIcon from '@mui/icons-material/BalanceRounded';
 import LocalFireDepartmentRoundedIcon from '@mui/icons-material/LocalFireDepartmentRounded';
 import StraightenRoundedIcon from '@mui/icons-material/StraightenRounded';
+import BookIcon from '@mui/icons-material/Book';
+import BookOutlinedIcon from '@mui/icons-material/BookOutlined';
+
+import RateReviewIcon from '@mui/icons-material/RateReview';
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
+import HourglassFullIcon from '@mui/icons-material/HourglassFull';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import FontDownloadIcon from '@mui/icons-material/FontDownload';
+import FontDownloadOutlinedIcon from '@mui/icons-material/FontDownloadOutlined';
+
+import BorderColorIcon from '@mui/icons-material/BorderColor';
+import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined';
+
+import FavoriteSharpIcon from '@mui/icons-material/FavoriteSharp';
+import FavoriteOutlinedIcon from '@mui/icons-material/FavoriteOutlined';
+
+import MeetingRoomOutlinedIcon from '@mui/icons-material/MeetingRoomOutlined';
+import MeetingRoomSharpIcon from '@mui/icons-material/MeetingRoomSharp';
+
 
 // convert semester to correct format in frontend
 // eg: Fall 2021 <- f21, Spring 2023 <- s23
@@ -161,5 +180,12 @@ export const instructorMetricIcon = {
   "clearGradingCriteria": StraightenRoundedIcon,
 };
 
-
-
+export const courseMetricIcon = {
+  "courseQuality": [BookIcon, BookOutlinedIcon],
+  "instructorQuality": [RateReviewIcon, RateReviewOutlinedIcon],
+  "difficulty": [HourglassFullIcon, HourglassEmptyIcon],
+  "amountLearned": [FontDownloadIcon, FontDownloadOutlinedIcon],
+  "workRequired": [BorderColorIcon, BorderColorOutlinedIcon],
+  "stimulateInterest": [FavoriteSharpIcon, FavoriteOutlinedIcon],
+  "instructorAccess": [MeetingRoomSharpIcon, MeetingRoomOutlinedIcon],
+}

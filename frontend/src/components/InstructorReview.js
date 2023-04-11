@@ -145,6 +145,7 @@ export default function InstructorReview({ reviews }) {
                       </Grid>
                       <Grid item>
                         <StyledRating
+                          readOnly
                           name="styled-rating"
                           defaultValue={review.overallRating}
                           IconContainerComponent={OverallIconContainer}

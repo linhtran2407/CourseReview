@@ -3,38 +3,61 @@ import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import { shortToLongSemester, courseMetricIcon } from "./Formartter";
+import { IconButton, TableBody, Tooltip, Typography } from "@mui/material";
 import {
-  instructorNameEmail,
-  shortToLongSemester,
-} from "./Formartter";
-import { TableBody } from "@mui/material";
-import { courseMetrics } from "./ReviewMetrics";
+  courseMetrics,
+  courseRequiredMetrics,
+  courseExpandedMetrics,
+} from "./ReviewMetrics";
 import "../css/Review.css";
 import { useLocation } from "react-router-dom";
 import AddReviewPrompt from "./AddReviewPrompt";
+import owl from "../images/owl.jpeg";
+import PersonIcon from "@mui/icons-material/Person";
+import DoubleArrowSharpIcon from "@mui/icons-material/DoubleArrowSharp";
+import KeyboardDoubleArrowLeftSharpIcon from "@mui/icons-material/KeyboardDoubleArrowLeftSharp";
+import { styled } from "@mui/material/styles";
+import Rating from "@mui/material/Rating";
 
-export default function CourseReview({reviews}) {
-    const [clickedRow, setClickedRow] = React.useState(null);
-    const location = useLocation();
-    React.useEffect(() => {
-        setClickedRow(null); 
-      }, [location]);
+export default function CourseReview({ reviews }) {
+  const [clickedRow, setClickedRow] = React.useState(null);
+  const [expandTable, setExpandTable] = React.useState(false);
+  const location = useLocation();
+  React.useEffect(() => {
+    setClickedRow(null);
+  }, [location]);
 
-  return (
-    reviews["grouped"] && Object.keys(reviews["grouped"]).length > 0?
+  const StyledRating = styled(Rating)(({ theme, value }) => ({
+    color: value > 3 ? theme.palette.success.main : value <= 2 ? theme.palette.error.light: theme.palette.warning,
+  }));
+  
+  return reviews["grouped"] && Object.keys(reviews["grouped"]).length > 0 ? (
     <Box className="box">
       <Paper
         className="reviewTables"
         sx={{ width: "100%", overflow: "hidden" }}
       >
-      <Chip
-        className="chip-header"
-        label="Review Averages"
-      />
+        <Chip className="chip-header" label="Review Averages" />
+        <Button
+          variant="contained"
+          endIcon={
+            expandTable ? (
+              <KeyboardDoubleArrowLeftSharpIcon />
+            ) : (
+              <DoubleArrowSharpIcon />
+            )
+          }
+          sx={{ float: "right", marginBottom: "8px" }}
+          size="small"
+          onClick={() => setExpandTable(!expandTable)}
+        >
+          {expandTable ? "Collapse" : "Expand"}
+        </Button>
         <TableContainer>
           <Table stickyHeader sx={{ border: "2px solid whitesmoke" }}>
             <TableRow>
@@ -45,11 +68,11 @@ export default function CourseReview({reviews}) {
                 key="instructor"
                 align="center"
                 className="reviewTableHeader"
-                style={{ width: "20%" }}
+                style={{ width: "10%" }}
               >
                 Instructor
               </TableCell>
-              {courseMetrics.map((column) => (
+              {courseRequiredMetrics.map((column) => (
                 <TableCell
                   key={column.id}
                   align="center"
@@ -58,6 +81,17 @@ export default function CourseReview({reviews}) {
                   {column.name}
                 </TableCell>
               ))}
+              {expandTable
+                ? courseExpandedMetrics.map((column) => (
+                    <TableCell
+                      key={column.id}
+                      align="center"
+                      className="reviewTableHeader"
+                    >
+                      {column.name}
+                    </TableCell>
+                  ))
+                : null}
             </TableRow>
 
             <TableBody>
@@ -67,23 +101,63 @@ export default function CourseReview({reviews}) {
                 return (
                   <TableRow
                     onClick={() => {
-                      setClickedRow(key);
+                      if (clickedRow && clickedRow === key) {
+                        setClickedRow(null);
+                      } else {
+                        setClickedRow(key);
+                      }
                     }}
                     hover
                     selected={clickedRow === key}
                     sx={{ "& > *": { borderBottom: "unset" } }}
                   >
-                    <TableCell>{shortToLongSemester(data.semester)}</TableCell>
-                    <TableCell component="th" scope="row">
-                      {instructorNameEmail(
-                        data.instructorName,
-                        data.instructorEmail
-                      )}
+                    <TableCell align="center">
+                      {shortToLongSemester(data.semester)}
                     </TableCell>
-
-                    {courseMetrics.map((metric) => (
-                      <TableCell align="center" > {data[metric.id]} </TableCell>
-                    ))}
+                    <Tooltip title={data.instructorEmail}>
+                      <TableCell component="th" scope="row">
+                        <IconButton>
+                          <PersonIcon></PersonIcon>
+                        </IconButton>
+                        {data.instructorName}
+                      </TableCell>
+                    </Tooltip>
+                    {courseRequiredMetrics.map((metric) => {
+                          const icon = courseMetricIcon[metric.id][0];
+                          const emptyIcon = courseMetricIcon[metric.id][1];
+                          return (
+                            <Tooltip title={data[metric.id]}>
+                              <TableCell align="center">
+                                <StyledRating
+                                  readOnly
+                                  value={data[metric.id]}
+                                  precision={0.1}
+                                  icon={React.createElement(icon)}
+                                  emptyIcon={React.createElement(emptyIcon)}
+                                />
+                              </TableCell>
+                            </Tooltip>
+                          );
+                        })}
+                    {expandTable
+                      ? courseExpandedMetrics.map((metric) => {
+                          const icon = courseMetricIcon[metric.id][0];
+                          const emptyIcon = courseMetricIcon[metric.id][1];
+                          return (
+                            <Tooltip title={data[metric.id]}>
+                              <TableCell align="center">
+                                <StyledRating
+                                  readOnly
+                                  value={data[metric.id]}
+                                  precision={0.1}
+                                  icon={React.createElement(icon)}
+                                  emptyIcon={React.createElement(emptyIcon)}
+                                />
+                              </TableCell>
+                            </Tooltip>
+                          );
+                        })
+                      : null}
                   </TableRow>
                 );
               })}
@@ -94,12 +168,8 @@ export default function CourseReview({reviews}) {
 
       {clickedRow ? (
         <Paper className="detailTable">
-          
-          <Chip
-            className="chip-header"
-            label="Detailed Reviews"
-          />
-          
+          <Chip className="chip-header" label="Detailed Reviews" />
+
           <TableContainer>
             <Table stickyHeader sx={{ border: "2px solid whitesmoke" }}>
               <TableRow>
@@ -154,8 +224,25 @@ export default function CourseReview({reviews}) {
             </Table>
           </TableContainer>
         </Paper>
-      ) : null}
-      
-    </Box> : <AddReviewPrompt />
+      ) : (
+        <Paper className="detailTable">
+          <img src={owl} className="owl" />
+          <Typography
+            sx={{
+              color: "grey",
+              display: "flex",
+              justifyContent: "center",
+              maxHeight: "300px",
+              minHeight: "100px",
+              alignItems: "center",
+            }}
+          >
+            Select a row to see individual reviews of a specific course offering
+          </Typography>
+        </Paper>
+      )}
+    </Box>
+  ) : (
+    <AddReviewPrompt />
   );
 }

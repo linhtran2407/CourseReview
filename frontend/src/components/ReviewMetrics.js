@@ -7,6 +7,17 @@ export const courseMetrics = [
   { id: "stimulateInterest", name: "Stimulate Interest" },
   { id: "instructorAccess", name: "Instructor Access" },
 ];
+export const courseRequiredMetrics = [
+  { id: "courseQuality", name: "Course Quality" },
+  { id: "instructorQuality", name: "Instructor Quality" },
+  { id: "difficulty", name: "Difficulty" },
+  { id: "amountLearned", name: "Amount Learned" },
+];
+export const courseExpandedMetrics = [
+  { id: "workRequired", name: "Work Required" },
+  { id: "stimulateInterest", name: "Stimulate Interest" },
+  { id: "instructorAccess", name: "Instructor Access" },
+];
 export const instructorMetrics = {
   "Communication and Engagement": [
     { id: "clearCommunication", name: "Clear Communication" },

@@ -7,11 +7,8 @@ export default function AddReviewPrompt() {
   return (
       <Grid item xs={12}>
         <Typography gutterBottom variant="body1">
-          There is no review currently. Feel free to contribute one :-{`)`}
+          There is no review currently. Feel free to contribute one 😄
         </Typography>
       </Grid>
   );
 }
-
-// add 2 review buttons
-// 

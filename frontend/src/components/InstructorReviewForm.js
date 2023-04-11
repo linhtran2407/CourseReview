@@ -11,7 +11,7 @@ import {
   Paper,
   FormControl,
   MenuItem,
-  Chip, 
+  Chip,
   InputLabel,
   Typography,
 } from "@mui/material";
@@ -30,9 +30,10 @@ import {
   shortToLongSemester,
 } from "./Formartter";
 import { instructorMetrics } from "./ReviewMetrics";
+import "../css/ChipHeader.css"
 
 /*
- * FORM TO ADD INSTRUCTOR REVIEW 
+ * FORM TO ADD INSTRUCTOR REVIEW
  *
  */
 function InstructorReviewForm() {
@@ -115,13 +116,13 @@ function InstructorReviewForm() {
   const [emailByInstructor, setEmailByInstructor] = React.useState([]);
   const [instructorLast, setInstructorLast] = React.useState(null);
   const [courses, setCourses] = React.useState([]);
-  
+
   useEffect(() => {
     // reset email + last name to empty
     setFormData({
       ...formData,
       email: "",
-      coursesTaken: []
+      coursesTaken: [],
     });
     setInstructorLast(null);
     setCourses([]);
@@ -157,11 +158,7 @@ function InstructorReviewForm() {
 
     const fullCourseNames = [];
     res.data.forEach((course) => {
-      const fullName = fullCourseName(
-        course.title,
-        course.number,
-        "bmc"
-      );
+      const fullName = fullCourseName(course.title, course.number, "bmc");
       const longSem = shortToLongSemester(course.semester);
       const nameWithSem = `${fullName} (${longSem})`;
       if (!fullCourseNames.includes(nameWithSem)) {
@@ -177,7 +174,12 @@ function InstructorReviewForm() {
   }, [instructorLast]);
 
   function hasRequiredFields() {
-    return formData.department && formData.email && formData.name && formData.coursesTaken.length > 0;
+    return (
+      formData.department &&
+      formData.email &&
+      formData.name &&
+      formData.coursesTaken.length > 0
+    );
   }
 
   const getIcon = (key) => {
@@ -203,10 +205,7 @@ function InstructorReviewForm() {
 
   function getStyles(course) {
     return {
-      fontWeight:
-        formData.coursesTaken.includes(course)
-          ? "bold"
-          : "regular",
+      fontWeight: formData.coursesTaken.includes(course) ? "bold" : "regular",
     };
   }
 
@@ -214,11 +213,10 @@ function InstructorReviewForm() {
     const {
       target: { value },
     } = event;
-    setFormData(
-      {...formData,
-      coursesTaken : typeof value === 'string' ? value.split(',') : value,}
-      
-    );
+    setFormData({
+      ...formData,
+      coursesTaken: typeof value === "string" ? value.split(",") : value,
+    });
     console.log(formData.coursesTaken);
   };
 
@@ -228,13 +226,17 @@ function InstructorReviewForm() {
     setSubmissionAlert(true);
   };
 
-  const closeSubmissionAlert = (email) => {
+  const closeSubmissionAlert = () => {
     setSubmissionAlert(false);
-    navigate(`/search-review/instructor/${email}`);
+    navigate(`/`);
   };
 
   return (
     <div>
+      <Chip
+        className="chip-header"
+        label="Instructor Review Form"
+      />
       <form onSubmit={handleSubmit}>
         <FormControl fullWidth style={{ marginBottom: "16px" }}>
           <InputLabel id="instructorName-label">Instructor Name</InputLabel>
@@ -304,18 +306,14 @@ function InstructorReviewForm() {
             renderValue={(selected) => (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {selected.map((value) => (
-                <Chip key={value} label={value} />
-              ))}
+                  <Chip key={value} label={value} />
+                ))}
               </Box>
             )}
             MenuProps={MenuProps}
           >
             {courses.map((course) => (
-              <MenuItem
-                key={course}
-                value={course}
-                style={getStyles(course)}
-              >
+              <MenuItem key={course} value={course} style={getStyles(course)}>
                 {course}
               </MenuItem>
             ))}
@@ -429,7 +427,7 @@ function InstructorReviewForm() {
 
         <AlertDialog
           open={submissionAlert}
-          handleClose={() => closeSubmissionAlert(formData.email)}
+          handleClose={closeSubmissionAlert}
         />
         <Stack spacing={2} direction="row">
           <Button

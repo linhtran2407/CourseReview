@@ -11,6 +11,7 @@ import {
   MenuItem,
   InputLabel,
   Typography,
+  Chip
 } from "@mui/material";
 import Select from "@mui/material/Select";
 import { useState } from "react";
@@ -19,7 +20,7 @@ import AlertDialog from "./AlertDialog";
 import { Check, Send } from "@mui/icons-material";
 import { longToShortSemester, getRatingDescription } from "./Formartter";
 import { courseMetrics } from "./ReviewMetrics";
-
+import "../css/ChipHeader.css"
 /*
  * FORM TO ADD COURSE REVIEW 
  *
@@ -213,13 +214,17 @@ function CourseReviewForm() {
     setSubmissionAlert(true);
   };
 
-  const closeSubmissionAlert = (courseNumber) => {
+  const closeSubmissionAlert = () => {
     setSubmissionAlert(false);
-    navigate(`/search-review/course/${courseNumber}`);
+    navigate(`/`);
   };
 
   return (
     <div>
+      <Chip
+        className="chip-header"
+        label="Course Review Form"
+      />
       <form onSubmit={handleSubmit}>
         <FormControl fullWidth style={{ marginBottom: "16px" }}>
           <InputLabel id="semester-label">Semester</InputLabel>
@@ -370,7 +375,7 @@ function CourseReviewForm() {
 
         <AlertDialog
           open={submissionAlert}
-          handleClose={() => closeSubmissionAlert(formData.courseNumber)}
+          handleClose={closeSubmissionAlert}
         />
         <Stack spacing={2} direction="row">
           <Button

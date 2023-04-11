@@ -1,0 +1,7 @@
+.chip-header {
+    display: flex !important;
+    justify-content: center !important;
+    margin-bottom: 16px !important;
+    font-size: 18px !important;
+    font-weight: bold;
+}

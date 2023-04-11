@@ -5,6 +5,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import Chip from "@mui/material/Chip";
 import Box from "@mui/material/Box";
 import {
   instructorNameEmail,
@@ -30,11 +31,12 @@ export default function CourseReview({reviews}) {
         className="reviewTables"
         sx={{ width: "100%", overflow: "hidden" }}
       >
+      <Chip
+        className="chip-header"
+        label="Review Averages"
+      />
         <TableContainer>
           <Table stickyHeader sx={{ border: "2px solid whitesmoke" }}>
-            <TableHead sx={{ fontWeight: "bold", fontSize: "17px" }}>
-              Metric Averages
-            </TableHead>
             <TableRow>
               <TableCell align="center" className="reviewTableHeader">
                 Semester
@@ -92,12 +94,14 @@ export default function CourseReview({reviews}) {
 
       {clickedRow ? (
         <Paper className="detailTable">
+          
+          <Chip
+            className="chip-header"
+            label="Detailed Reviews"
+          />
+          
           <TableContainer>
             <Table stickyHeader sx={{ border: "2px solid whitesmoke" }}>
-              <TableHead sx={{ fontWeight: "bold", fontSize: "17px" }}>
-                Individual Reviews
-              </TableHead>
-
               <TableRow>
                 <TableCell
                   align="center"
@@ -120,7 +124,7 @@ export default function CourseReview({reviews}) {
                   style={{ width: "30%" }}
                   className="reviewTableHeader"
                 >
-                  Additional Comment
+                  Comment
                 </TableCell>
               </TableRow>
 

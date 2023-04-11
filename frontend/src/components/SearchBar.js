@@ -59,7 +59,7 @@ function SearchBar() {
           renderInput={(params) => (
             <TextField
               {...params}
-              label="Search for reviews of course or instructor"
+              label="Search for a course or an instructor"
               InputProps={{
                 ...params.InputProps,
                 type: "search",
